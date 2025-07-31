@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+*{
+    font-family: "Poppins", sans-serif;
+}
+:root{
+  --main-color--:#004B29;
+  --second-color--:#FDA600;
+}
+/* button{
+  background-color: var(--bg-color--);
+  color: white;
+} */
