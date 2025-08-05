@@ -1,47 +1,109 @@
-import React, { useEffect } from "react";
+import headerImg from '../assets/images/header.jpg'
+import mainImg from '../assets/images/main.jpg'
+import footerImg from '../assets/images/footer.jpg'
 
-const PriviewData = ({ data }) => {
-  const { patientInfo, selectedMedicines } = data;
 
-  useEffect(() => {
-    // Trigger print when the page loads
-    window.print();
-  }, []);
+
+const PriviewData = ({ userInformation, addmedicines, open, close }) => {
+  const now = new Date();
+  const formatted = `${now.getDate().toString().padStart(2, '0')}/${
+    (now.getMonth() + 1).toString().padStart(2, '0')
+  }/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now
+    .getMinutes()
+    .toString()
+    .padStart(2, '0')}`;
+
+  const formattedDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-white shadow-lg mt-4 print:shadow-none print:p-2 print:m-0">
-      <h1 className="text-2xl font-bold text-center text-[#004B29] mb-4">Prescription Preview</h1>
+    <div
+      className="min-h-screen flex items-center justify-center bg-gray-100 p-4"
+      style={{ paddingBottom: "60px" }}
+    >
+      <div className="a4-container">
+        {/* Header */}
+        <div className="header-section">
+          <img src={headerImg} alt="Header" className="header-image" />
+        </div>
 
-      {/* Patient Info */}
-      <div className="border p-4 mb-4 rounded">
-        <p><strong>Name:</strong> {patientInfo.name}</p>
-        <p><strong>Age:</strong> {patientInfo.age}</p>
-        <p><strong>Reason:</strong> {patientInfo.reason}</p>
-        <p><strong>Symptoms:</strong> {patientInfo.symptoms}</p>
-      </div>
-
-      {/* Medicine List */}
-      <div className="space-y-4">
-        {selectedMedicines.map((item, index) => (
-          <div key={index} className="p-4 border rounded bg-[#f5f5f5]">
-            <p className="font-semibold text-[#004B29]">{item.name}</p>
-            <p>Dosage: {item.dosage}</p>
-            <p>Frequency: {item.frequency} time(s) a day</p>
+        {/* Info Section */}
+        <div className="info-section">
+          <div className="info-grid">
+            <div className="info-item">
+              <label>Name:</label>
+              {userInformation?.patientName || '--'}
+            </div>
+            <div className="info-item">
+              <label>S.No:</label>
+              {userInformation?.patientCode}
+            </div>
+            <div className="info-item">
+              <label>Date of Birth:</label>
+              {formattedDate(userInformation?.dateOfBirth)}
+            </div>
+            <div className="info-item">
+              <label>Date:</label>
+              {formatted}
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* Print Button (Only shown when not in print mode) */}
-      <div className="mt-6 flex justify-end print:hidden">
-        <button
-          onClick={() => window.print()}
-          className="bg-[#004B29] hover:bg-[#005d34] text-white py-2 px-4 rounded shadow"
+        {/* Main Section with background */}
+        <div
+          className="main-section"
+          style={{
+            backgroundImage: `url(${mainImg})`,
+          }}
         >
-          Print
-        </button>
+          <div>
+            <h3 className="font-semibold text-gray-700 mb-2">💊 Medicines</h3>
+            <table className="w-full text-left border border-gray-200">
+              <thead className="bg-gray-100 text-sm">
+                <tr>
+                  <th className="p-2 border">#</th>
+                  <th className="p-2 border">Name</th>
+                  <th className="p-2 border">Dose</th>
+                  <th className="p-2 border">Frequency</th>
+                </tr>
+              </thead>
+              <tbody>
+                {addmedicines.map((med, idx) => (
+                  <tr key={idx} className="text-sm">
+                    <td className="p-2 border">{idx + 1}</td>
+                    <td className="p-2 border">{med.name}</td>
+                    <td className="p-2 border">{med.dose || '--'}</td>
+                    <td className="p-2 border">
+                      {Object.entries(med.frequency || {})
+                        .map(([time, meals]) => {
+                          const labels = [];
+                          if (meals.beforeMeal) labels.push(`${time} (Before)`);
+                          if (meals.afterMeal) labels.push(`${time} (After)`);
+                          return labels.join(', ');
+                        })
+                        .join(', ') || '--'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="footer-section">
+          <img src={footerImg} alt="Footer" className="footer-image" />
+        </div>
       </div>
     </div>
   );
 };
 
-export default PriviewData;
+
+export default PriviewData

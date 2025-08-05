@@ -1,24 +1,42 @@
 // src/pages/LoginPage.jsx
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loginFail, loginStart, loginSuccess } from "../redux/authSlice";
+import { loginUser } from "../api/authService";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
-  const [form, setForm] = useState({
-    // name: "",
-    email: "",
-    password: "",
-    role: "customer",
-  });
+  // const [form, setForm] = useState({
+  //   // name: "",
+  //   email: "",
+  //   password: "",
+  //   // role: "customer",
+  // });
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  // const handleChange = (e) => {
+  //   setForm({ ...form, [e.target.name]: e.target.value });
+  // };
 
-  const handleSubmit = (e) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
+
+  const navigate = useNavigate()
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login form data:", form);
-    // 👇 Abhi yahan API call kar sakte ho
+    dispatch(loginStart());
+    try {
+      // alert(email)
+
+      const user = await loginUser(email, password);
+      dispatch(loginSuccess(user));
+      navigate('/dashboard')
+    } catch (err) {
+      dispatch(loginFail(err.response?.data?.message || "Login failed"));
+    }
   };
 
   return (
@@ -45,8 +63,9 @@ const LoginPage = () => {
             <input
               type="email"
               name="email"
-              value={form.email}
-              onChange={handleChange}
+              // value={form.email}
+               onChange={(e) => setEmail(e.target.value)}
+              // onChange={handleChange}
               className="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-1 "
               required
             />
@@ -58,8 +77,9 @@ const LoginPage = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                value={form.password}
-                onChange={handleChange}
+                // value={form.password}
+                // onChange={handleChange}
+                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-1 "
                 required
               />
@@ -73,7 +93,7 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <div>
+          {/* <div>
             <label className="block font-medium">Role</label>
             <select
               name="role"
@@ -83,16 +103,21 @@ const LoginPage = () => {
             >
               <option value="admin">Admin</option>
               <option value="user">User</option>
-              {/* <option value="customer">Customer</option> */}
+        
             </select>
-          </div>
+          </div> */}
 
-          <button
+          {/* <button
             type="submit"
             className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded transition"
           >
             Login
-          </button>
+          </button> */}
+                <button type="submit" disabled={loading}>
+        {loading ? "Loading..." : "Login"}
+      </button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
         </form>
       </div>
     </div>
