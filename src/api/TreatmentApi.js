@@ -51,24 +51,55 @@ export const createTreatment = async (patientData) => {
 };
 
 
+export const GetAllPatientTreatment = async () => {
+  try {
+     const response = await axiosInstance.get("/treatments");
 
-// const handleAxiosError = (error) => {
-//   if (error.response) {
-//     const { data, status } = error.response;
-//     if (status === 400) {
-//       throw new Error(data.message || "Invalid request.");
-//     } else if (status === 401) {
-//       throw new Error("Unauthorized. Please login again.");
-//     } else if (status === 404) {
-//       throw new Error("Patient not found.");
-//     } else if (status === 500) {
-//       throw new Error("Server error. Please try again later.");
-//     } else {
-//       throw new Error(data.message || "Something went wrong.");
-//     }
-//   } else if (error.request) {
-//     throw new Error("No response from server. Check your network.");
-//   } else {
-//     throw new Error(error.message || "An unknown error occurred.");
-//   }
-// };
+    // Sort by createdAt (latest first)
+    const sortedData = response?.data?.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    
+    return sortedData;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
+export const GetSinglePatientTreatment = async (id) => {
+  console.log(id)
+  try {
+     const response = await axiosInstance.get(`/treatments/${id}`);
+
+    // Sort by createdAt (latest first)
+    const sortedData = response?.data?.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    
+    return sortedData;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
+
+
+
+const handleAxiosError = (error) => {
+  if (error.response) {
+    const { data, status } = error.response;
+    if (status === 400) {
+      throw new Error(data.message || "Invalid request.");
+    } else if (status === 401) {
+      throw new Error("Unauthorized. Please login again.");
+    } else if (status === 404) {
+      throw new Error("Patient not found.");
+    } else if (status === 500) {
+      throw new Error("Server error. Please try again later.");
+    } else {
+      throw new Error(data.message || "Something went wrong.");
+    }
+  } else if (error.request) {
+    throw new Error("No response from server. Check your network.");
+  } else {
+    throw new Error(error.message || "An unknown error occurred.");
+  }
+};

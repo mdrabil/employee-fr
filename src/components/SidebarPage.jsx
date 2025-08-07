@@ -4,11 +4,14 @@ import { NavLink } from "react-router-dom";
 const SidebarPage = () => {
   const navItems = [
     { label: "Dashboard", path: "/dashboard" },
-    { label: "book", path: "/book" },
+    { label: "Patient List", path: "/" },
+    // { label: "book", path: "/book" },
+    { label: "Treatments", path: "/treatments" },
+    { label: "Medicines", path: "/medicines" },
   ];
 
   return (
-    <aside className="w-64 bg-[#004B29] text-white pt-20 px-3">
+    <aside className="w-40 bg-[#004B29] text-white pt-20 px-3">
       {navItems.map((item) => (
         <NavLink
           key={item.path}

@@ -3,20 +3,21 @@ import React, { useEffect, useState } from 'react';
 import PatientData from '../components/PatientData';
 import { GetTodayPatient } from '../api/PatientApi';
 import { formatDate } from '../api/CustomApi';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import socket from '../socket/socket';
+import { AddPatient } from '../redux/InitialPatient';
 
 const ListOfPatient = () => {
-  const [selectedPatient, setSelectedPatient] = useState(null);
+  const user = useSelector(state=>state?.auth?.user)
+
+  const role = user?.user?.role?.name || ""
+ 
+  // const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState([]);
   const [error, setError] = useState("");
-
-
-
-
-
-
-
-
-  const fetchPatients = async () => {
+const navigate = useNavigate()
+const fetchPatients = async () => {
     try {
         const data = await GetTodayPatient();
         setPatients(data);
@@ -26,6 +27,27 @@ const ListOfPatient = () => {
         setError(err.message);
       }
     };
+
+
+useEffect(() => {
+  // Existing listener
+  // socket.on("receive_patient", (data) => {
+  //   setSelectedPatient(data);
+  // });
+
+  // 🔥 Listen for new patient being added
+  socket.on("new_patient_added", () => {
+    console.log("New patient received, refreshing list...");
+    fetchPatients();  // refresh patient list
+  });
+
+  return () => {
+    socket.off("receive_patient");
+    socket.off("new_patient_added");
+  };
+}, []);
+
+  
     
     useEffect(() => {
     fetchPatients();
@@ -47,16 +69,53 @@ const ListOfPatient = () => {
   const totalPatients = patients.length;
   const done = patients.filter(p => p.status === 'treated').length;
   const pending = totalPatients - done || '0' ;
-  const currentNo = patients.find(p => p.status === 'pending')?.id || 'N/A';
+ 
 
-  const handleCheck = (data) => {
-    setSelectedPatient(data);
-  };
+  // const handleCheck = (data) => {
+  //   // alert()
+  //   console.log('selected pa data',data)
+  
+  //     socket.emit("selected_patient", data);
+  // };
+
+
+//   import { useDispatch, useSelector } from "react-redux";
+// import { setPatient } from "../redux/selectedPatientSlice";
+  const dispatch = useDispatch();
+  const selectedPatient = useSelector((state) => state.patient?.patient);
+
+const handleCheck = (data) => {
+
+  if (selectedPatient?._id === data._id);
+
+  // Emit socket event
+  socket.emit("selected_patient", data);
+  dispatch(AddPatient(data));
+
+  // Save in redux
+};
 
   return (
     <div className="p-4 space-y-6">
       {/* Stat Boxes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+
+{user?.user?.role?.name==='receptionist' &&    <div className="flex justify-center items-center gap-4 my-4">
+      <button
+        onClick={() => navigate('/')}
+        className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+      >
+        Booked Appointment
+      </button>
+
+      <button
+        onClick={() => navigate('/book_appointment')}
+        className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+      >
+        Book Appointment
+      </button>
+    </div>}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-green-100 text-green-800 p-4 rounded shadow text-center">
           <h2 className="text-xl font-bold">{totalPatients}</h2>
           <p>Total Patients</p>
@@ -79,7 +138,7 @@ const ListOfPatient = () => {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Patient Table */}
         <div className="bg-white shadow-md rounded-lg overflow-x-auto w-full lg:w-3/4">
-          <table className="min-w-full text-left">
+          <table className="min-w-full text-center">
             <thead className="bg-[#004B29] text-white">
               <tr>
                 <th className="py-2 px-4">#</th>
@@ -88,35 +147,59 @@ const ListOfPatient = () => {
                 <th className="py-2 px-4">Status</th>
               </tr>
             </thead>
-            <tbody>
-              {patients.map((p, index) => (
-                <tr key={p.id} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
-                  <td className="py-2 px-4">{p.patientCode}</td>
-                  <td className="py-2 px-4 tex-center">{p.patientName}</td>
-                  <td className="py-2 px-4 capitalize text-center">{formatDate(p?.createdAt)}</td>
-                  <td className="py-2 px-4">
-                    {p.status === 'new' ? (
-                      <button
-                        onClick={() => handleCheck(p)}
-                        className="bg-[#FDA600] hover:bg-orange-600 text-white px-4 py-1 rounded"
-                      >
-                        new
-                      </button>
-                    ) : (
-                      <span className="bg-green-500 text-white px-3 py-1 rounded text-sm">
-                        Checked
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+        <tbody>
+  {patients.length === 0 ? (
+    <tr>
+      <td colSpan="4" className="text-center text-gray-500 py-4">
+        No patients added
+      </td>
+    </tr>
+  ) : (
+    patients.map((p, index) => {
+      const isAdmin = user?.user?.role?.name === 'admin';
+      const isSelected = selectedPatient?._id === p._id;
+
+      let statusLabel = '';
+      let statusClass = '';
+
+      if (p.status === 'treated') {
+        statusLabel = 'Checked';
+        statusClass = 'bg-green-500';
+      } else if (isSelected) {
+        statusLabel = 'Checking';
+        statusClass = 'bg-blue-500';
+      } else {
+        statusLabel = isAdmin ? 'Check Now' : 'Pending';
+        statusClass = isAdmin ? 'bg-yellow-500' : 'bg-red-500';
+      }
+
+      return (
+        <tr key={p._id || index} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
+          <td className="py-2 px-4">{p.patientCode}</td>
+          <td className="py-2 px-4 text-center">{p.patientName}</td>
+          <td className="py-2 px-4 text-center capitalize">{formatDate(p?.createdAt)}</td>
+          <td className="py-2 px-4">
+         
+              <button
+                onClick={() => handleCheck(p)}
+                className={`${statusClass} hover:opacity-90 text-white px-4 py-1 rounded`}
+              >
+                {statusLabel}
+              </button>
+            
+          </td>
+        </tr>
+      );
+    })
+  )}
+</tbody>
+
           </table>
         </div>
 
         {/* Side Patient Detail */}
        <PatientData 
-     selectedPatient={selectedPatient}
+    //  selectedPatient={selectedPatient}
        />
       </div>
     </div>

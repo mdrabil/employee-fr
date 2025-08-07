@@ -1,8 +1,8 @@
-/* A4 Container Styles */
+/* 
 .a4-container {
   width: 210mm;
   height: 297mm;
-  /* position: absolute; */
+
   margin: 20px auto;
   background: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -12,7 +12,7 @@
   box-sizing: border-box;
 }
 
-/* Header Section */
+
 .header-section {
   height: auto;
   display: flex;
@@ -27,7 +27,7 @@
   object-fit: contain;
 }
 
-/* Information Section */
+
 .info-section {
   height: auto;
   margin: 20px;
@@ -72,7 +72,7 @@
   border-bottom: 2px solid #008080;
 }
 
-/* Main Section */
+
 .main-section {
   height: 45%;
   display: flex;
@@ -87,7 +87,7 @@
   object-fit: contain;
 }
 
-/* Footer Section */
+
 .footer-section {
   height: auto;
   display: flex;
@@ -102,7 +102,7 @@
   object-fit: contain;
 }
 
-/* Responsive Design */
+
 @media print {
   .a4-container {
     width: 210mm;
@@ -122,4 +122,4 @@
   .info-grid {
     grid-template-columns: 1fr;
   }
-}
+} */

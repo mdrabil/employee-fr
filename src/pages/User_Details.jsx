@@ -9,6 +9,7 @@ import PriviewData from '../components/PriviewData';
 import { toast } from 'react-toastify';
 import { createTreatment } from '../api/TreatmentApi';
 import { useMediaQuery } from '@mui/material';
+import { DeletePatient } from '../redux/InitialPatient';
 const User_Details = () => {
   const { UserId } = useParams();
   const isTabletOrBelow = useMediaQuery('(max-width: 768px)');
@@ -26,9 +27,9 @@ const User_Details = () => {
 
   const [selectedDose, setSelectedDose] = useState(null);
   const [selectedFreq, setSelectedFreq] = useState({
-  morning: { beforeMeal: false, afterMeal: false },
-  afternoon: { beforeMeal: false, afterMeal: false },
-  night: { beforeMeal: false, afterMeal: false }
+  सुबह: { beforeMeal: false, afterMeal: false },
+  दोपहर: { beforeMeal: false, afterMeal: false },
+  रात: { beforeMeal: false, afterMeal: false }
 });
 
   const [symptoms, setSymptoms] = useState('');
@@ -40,23 +41,66 @@ const dispatch = useDispatch()
 
 // const { patientmedicine } = useSelector(state => state.patientmedicine);
 
-const handleAddMedicine = () => {
-  if (!selectedMedicine) return toast.error("Please select a medicine");
+// const handleAddMedicine = () => {
+//   if (!selectedMedicine) return toast.error("Please select a medicine");
 
-  const allFalse = Object.values(selectedFreq).every(
-    (time) => !time.beforeMeal && !time.afterMeal
+//   const allFalse = Object.values(selectedFreq).every(
+//     (time) => !time.beforeMeal && !time.afterMeal
+//   );
+
+//   if (allFalse) {
+//     toast.error("Please select at least one frequency (before/after meal)");
+//     return;
+//   }
+// // alert(selectedMedicine?.type)
+//   const newEntry = {
+//     name: selectedMedicine.name,
+//     type:selectedMedicine?.type,
+//     patientId:UserId,
+//     dose: selectedDose,
+//     frequency: selectedFreq,
+//   };
+
+//   dispatch(AddPatientMedicine(newEntry));
+
+//   // Reset state
+//   setSelectedMedicine(null);
+//   setSelectedDose('');
+// setSelectedFreq({
+//   सुबह: { beforeMeal: false, afterMeal: false },
+//   दोपहर: { beforeMeal: false, afterMeal: false },
+//   रात: { beforeMeal: false, afterMeal: false }
+// });
+
+//   setSearch('');
+// };
+
+const handleAddMedicine = () => {
+  if (!selectedMedicine || typeof selectedMedicine !== 'object') {
+    return toast.error("कृपया एक दवा चुनें");
+  }
+
+  if (!selectedMedicine.name || typeof selectedMedicine.name !== 'string') {
+    return toast.error("दवा का नाम मान्य नहीं है");
+  }
+
+  if (selectedMedicine?.type === 'Syrup' && !selectedDose) {
+    return toast.error("Syrup के लिए dose चुनना जरूरी है");
+  }
+
+  const isFreqValid = Object.values(selectedFreq).some(
+    (time) => time.beforeMeal || time.afterMeal
   );
 
-  if (allFalse) {
-    toast.error("Please select at least one frequency (before/after meal)");
-    return;
+  if (!isFreqValid) {
+    return toast.error("कृपया कम से कम एक बार खाने से पहले/बाद का समय चुनें");
   }
-// alert(selectedMedicine?.type)
+
   const newEntry = {
     name: selectedMedicine.name,
-    type:selectedMedicine?.type,
-    patientId:UserId,
-    dose: selectedDose,
+    type: selectedMedicine?.type || '',
+    patientId: UserId,
+    dose: selectedDose || '',
     frequency: selectedFreq,
   };
 
@@ -65,14 +109,15 @@ const handleAddMedicine = () => {
   // Reset state
   setSelectedMedicine(null);
   setSelectedDose('');
-setSelectedFreq({
-  morning: { beforeMeal: false, afterMeal: false },
-  afternoon: { beforeMeal: false, afterMeal: false },
-  night: { beforeMeal: false, afterMeal: false }
-});
+  setSelectedFreq({
+    सुबह: { beforeMeal: false, afterMeal: false },
+    दोपहर: { beforeMeal: false, afterMeal: false },
+    रात: { beforeMeal: false, afterMeal: false }
+  });
 
   setSearch('');
 };
+
 
     const doseOptions = ['2ml', '5ml', '7.5ml', '10ml', '15ml', '20ml'];
 
@@ -84,16 +129,32 @@ setSelectedFreq({
   console.log('dawa add ha ',patientmedicine)
  
 
-  const handleDelete = (index) => {
-    const deletedmedicine = {
-      patientId:UserId,
-       nameToDelete :index?.name
+  // const handleDelete = (index) => {
+  //   const deletedmedicine = {
+  //     patientId:UserId,
+  //      nameToDelete :index?.name
 
-    }
-    console.log('delewala',deletedmedicine)
-  dispatch(DeletePatientMedicine(deletedmedicine))
-  };
+  //   }
+  //   console.log('delewala',deletedmedicine)
+  // dispatch(DeletePatientMedicine(deletedmedicine))
+  // };
   // ✅ Always fetch medicine
+
+
+  const handleDelete = (medicine) => {
+  if (!medicine || !medicine.name) {
+    return toast.error("Medicine delete करने में समस्या आई");
+  }
+
+  const deletedmedicine = {
+    patientId: UserId,
+    nameToDelete: medicine.name
+  };
+
+  dispatch(DeletePatientMedicine(deletedmedicine));
+};
+
+
 
     const fetchMedicine = async () => {
       try {
@@ -113,21 +174,42 @@ setSelectedFreq({
 
   // ✅ Fetch Patients - Only if UserId is present
   
+    // const fetchPatients = async () => {
+    //   try {
+    //     if (UserId) {
+    //       const data = await GetSinglePatient(UserId);
+    //       if (!data) {
+    //         navigate("/404"); // ❗No data, redirect
+    //       } else {
+    //         setPatients(data);
+    //       }
+    //     }
+    //   } catch (err) {
+    //     setError(err.message);
+    //     navigate("/404"); // ❗API failed, redirect
+    //   }
+    // };
+
     const fetchPatients = async () => {
-      try {
-        if (UserId) {
-          const data = await GetSinglePatient(UserId);
-          if (!data) {
-            navigate("/404"); // ❗No data, redirect
-          } else {
-            setPatients(data);
-          }
-        }
-      } catch (err) {
-        setError(err.message);
-        navigate("/404"); // ❗API failed, redirect
-      }
-    };
+  try {
+    if (!UserId) {
+      setError("Invalid User ID");
+      return;
+    }
+
+    const data = await GetSinglePatient(UserId);
+    if (!data || typeof data !== 'object') {
+      navigate("/404");
+    } else {
+      setPatients(data);
+    }
+  } catch (err) {
+    console.error("Fetch patient failed:", err);
+    setError("Patient fetch failed");
+    navigate("/404");
+  }
+};
+
 
 
     // const dosage = [{
@@ -144,14 +226,29 @@ useEffect(() => {
   fetchMedicine();
 }, []);
 
+// const frequencyOptions = [
+//   { label: "Naste Se Pahle", field: "morning", type: "beforeMeal" },
+//   { label: "Naste ke Baad", field: "morning", type: "afterMeal" },
+//   { label: "Dophar:Khane Se Pahle", field: "afternoon", type: "beforeMeal" },
+//   { label: "Dophar:Khane Ke Baad", field: "afternoon", type: "afterMeal" },
+//   { label: "Rat:Khane Se Pahle", field: "night", type: "beforeMeal" },
+//   { label: "Raat:Khane Ke Baad", field: "night", type: "afterMeal" }
+// ];
+
 const frequencyOptions = [
-  { label: "Naste Se Pahle", field: "morning", type: "beforeMeal" },
-  { label: "Naste ke Baad", field: "morning", type: "afterMeal" },
-  { label: "Dophar:Khane Se Pahle", field: "afternoon", type: "beforeMeal" },
-  { label: "Dophar:Khane Ke Baad", field: "afternoon", type: "afterMeal" },
-  { label: "Rat:Khane Se Pahle", field: "night", type: "beforeMeal" },
-  { label: "Raat:Khane Ke Baad", field: "night", type: "afterMeal" }
+  // सुबह (Morning)
+  { label: "सुबह: खाने से पहले", field: "सुबह", type: "beforeMeal" },
+  
+  // दोपहर (Afternoon)
+  { label: "दोपहर: खाने से पहले", field: "दोपहर", type: "beforeMeal" },
+  
+  // रात (Night)
+  { label: "रात: खाने से पहले", field: "रात", type: "beforeMeal" },
+  { label: "सुबह: खाने के बाद", field: "सुबह", type: "afterMeal" },
+  { label: "दोपहर: खाने के बाद", field: "दोपहर", type: "afterMeal" },
+  { label: "रात: खाने के बाद", field: "रात", type: "afterMeal" },
 ];
+
 
 const handleFreqChange = (field, type) => {
   setSelectedFreq((prev) => ({
@@ -163,37 +260,101 @@ const handleFreqChange = (field, type) => {
   }));
 };
 
+// const handleEdit = (medicine) => {
+//   setSelectedMedicine(medicine);
+//   setSelectedDose(medicine.dose || '');
+//   setSelectedFreq(medicine.frequency || {
+//     सुबह: { beforeMeal: false, afterMeal: false },
+//     दोपहर: { beforeMeal: false, afterMeal: false },
+//     रात: { beforeMeal: false, afterMeal: false }
+//   });
+// };
+
+// const formatFrequency = (freq) => {
+//   if (!freq) return '--';
+
+//   const parts = [];
+
+//   const mapTime = {
+//     morning: 'Morning',
+//     afternoon: 'Afternoon',
+//     night: 'Night'
+//   };
+
+//   Object.keys(freq).forEach(time => {
+//     const before = freq[time]?.beforeMeal;
+//     const after = freq[time]?.afterMeal;
+
+//     let meals = [];
+//     if (before) meals.push('Before Meal');
+//     if (after) meals.push('After Meal');
+
+//     if (meals.length > 0) {
+//       parts.push(`${mapTime[time]}:  ${meals.join(', ')}`);
+//     }
+//   });
+
+//   return parts.length > 0 ? parts.join(' | ') : '--';
+// };
+
 const handleEdit = (medicine) => {
+  if (!medicine || typeof medicine !== 'object') {
+    return toast.error("दवा edit नहीं हो सकी");
+  }
+
   setSelectedMedicine(medicine);
   setSelectedDose(medicine.dose || '');
   setSelectedFreq(medicine.frequency || {
-    morning: { beforeMeal: false, afterMeal: false },
-    afternoon: { beforeMeal: false, afterMeal: false },
-    night: { beforeMeal: false, afterMeal: false }
+    सुबह: { beforeMeal: false, afterMeal: false },
+    दोपहर: { beforeMeal: false, afterMeal: false },
+    रात: { beforeMeal: false, afterMeal: false }
   });
 };
 
+
+// const formatFrequency = (freq) => {
+//   if (!freq) return '--';
+
+//   const parts = [];
+
+//   const mapTime = {
+//     सुबह: 'सुबह',
+//     दोपहर: 'दोपहर',
+//     रात: 'रात'
+//   };
+
+//   Object.keys(freq).forEach(time => {
+//     const before = freq[time]?.beforeMeal;
+//     const after = freq[time]?.afterMeal;
+
+//     let meals = [];
+//     if (before) meals.push('खाने से पहले');
+//     if (after) meals.push('खाने के बाद');
+
+//     if (meals.length > 0) {
+//       parts.push(`${mapTime[time]}: ${meals.join(', ')}`);
+//     }
+//   });
+
+//   return parts.length > 0 ? parts.join(' | ') : '--';
+// };
+
 const formatFrequency = (freq) => {
-  if (!freq) return '--';
+  if (!freq || typeof freq !== 'object') return '--';
 
   const parts = [];
+  const mapTime = { सुबह: 'सुबह', दोपहर: 'दोपहर', रात: 'रात' };
 
-  const mapTime = {
-    morning: 'Morning',
-    afternoon: 'Afternoon',
-    night: 'Night'
-  };
-
-  Object.keys(freq).forEach(time => {
+  Object.keys(mapTime).forEach((time) => {
     const before = freq[time]?.beforeMeal;
     const after = freq[time]?.afterMeal;
 
     let meals = [];
-    if (before) meals.push('Before Meal');
-    if (after) meals.push('After Meal');
+    if (before) meals.push('खाने से पहले');
+    if (after) meals.push('खाने के बाद');
 
     if (meals.length > 0) {
-      parts.push(`${mapTime[time]}:  ${meals.join(', ')}`);
+      parts.push(`${mapTime[time]}: ${meals.join(', ')}`);
     }
   });
 
@@ -201,32 +362,79 @@ const formatFrequency = (freq) => {
 };
 
 
+
+// const handleDoneTreatment = async () => {
+//   if (!UserId) {
+//     toast.error("User is not valid");
+//     return;
+//   }
+
+//   const payload = {
+//     patientId:patient._id || UserId,
+//     patinentProblem:patient?.reasonForVisit,
+//     symptoms:symptoms,
+//     patientmedicine: patientmedicine,
+//   };
+
+//   try {
+//     const data = await createTreatment(payload);
+// // const data = true
+//     if (data) {
+//       toast.success("Treatment is successfully done!");
+
+//       dispatch(DeleteAllMedicinesForPatient(UserId));
+//       // Trigger print after success
+//       setTimeout(() => {
+//         // window.print();
+//         setShowPriviewData(true)
+//       }, 500); // Delay to ensure success message renders first
+//     }
+//   } catch (error) {
+//     console.error("Treatment error:", error.message);
+//     // Error messages already handled in createTreatment
+//   }
+// };
+
+
 const handleDoneTreatment = async () => {
-  if (!UserId) {
-    toast.error("User is not valid");
+  if (!UserId || !patient) {
+    toast.error("Patient की जानकारी नहीं मिल सकी");
+    return;
+  }
+
+  // if (!symptoms || symptoms.trim().length < 3) {
+  //   toast.error("लक्षण सही से भरें");
+  //   return;
+  // }
+
+  if (!Array.isArray(patientmedicine) || patientmedicine.length === 0) {
+    toast.error("कृपया कम से कम एक दवा जोड़ें");
     return;
   }
 
   const payload = {
-    patientId: UserId,
+    patientId: patient._id || UserId,
+    patinentProblem: patient?.reasonForVisit || '',
+    symptoms: symptoms,
     patientmedicine: patientmedicine,
   };
 
+  console.log('data final jo backend me jayga',payload)
   try {
     const data = await createTreatment(payload);
-
+// const data= true
     if (data) {
-      toast.success("Treatment is successfully done!");
-
+      toast.success("इलाज सफलतापूर्वक दर्ज हो गया!");
       dispatch(DeleteAllMedicinesForPatient(UserId));
-      // Trigger print after success
-      setTimeout(() => {
-        window.print();
-      }, 500); // Delay to ensure success message renders first
+      dispatch(DeletePatient())
+
+    //   setTimeout(() => {
+    //     setShowPriviewData(true);
+    //   }, 500);
     }
   } catch (error) {
     console.error("Treatment error:", error.message);
-    // Error messages already handled in createTreatment
+    toast.error("ट्रीटमेंट सेव नहीं हो सका");
   }
 };
 
@@ -252,9 +460,9 @@ const handleDoneTreatment = async () => {
   }}>
         <div className="bg-green-100 p-2 rounded-lg">
         <h2 className="text- font-bold text-green-900 mb-3">🧑‍⚕️ Patient Details</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-medium text-gray-700">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 font-medium text-gray-700">
           <div>Name: <span className="font-semibold text-black">{patient?.patientName}</span></div>
-          <div>Age: <span className="font-semibold text-black">56</span></div>
+          <div className='text-right pr-6'>Age: <span className="font-semibold text-black">{patient?.age}</span></div>
           <div>Reason: <span className="font-semibold text-black">{patient?.reasonForVisit}</span></div>
         </div>
       </div>
@@ -361,7 +569,7 @@ const handleDoneTreatment = async () => {
         checked={selectedFreq[field][type]}
         onChange={() => handleFreqChange(field, type)}
       />
-      <span>{label}</span>
+      <span className='text-sm'>{label}</span>
     </label>
   ))}
 </div>

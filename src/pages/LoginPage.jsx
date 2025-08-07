@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginFail, loginStart, loginSuccess } from "../redux/authSlice";
 import { loginUser } from "../api/authService";
 import { useNavigate } from "react-router-dom";
+import socket from "../socket/socket";
 
 const LoginPage = () => {
   // const [form, setForm] = useState({
@@ -33,6 +34,9 @@ const LoginPage = () => {
 
       const user = await loginUser(email, password);
       dispatch(loginSuccess(user));
+         socket.connect();
+         console.log('userid',user)
+    socket.emit("user_connected", user?.user?._id);
       navigate('/dashboard')
     } catch (err) {
       dispatch(loginFail(err.response?.data?.message || "Login failed"));

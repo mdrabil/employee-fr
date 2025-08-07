@@ -5,11 +5,19 @@ import { persistReducer, persistStore } from "redux-persist";
 import { combineReducers } from "redux";
 // import { thunk } from "redux-thunk"; // ✅ FIXED
 import patientMedicineReducer  from './Pmedicine.js'
+import patientReducer  from './InitialPatient.js'
+
+// const persistConfig = {
+//   key: "auth",
+//   storage,
+//     whitelist: ["auth", "patientmedicine"], // 👈 optionally persist both
+// };
 const persistConfig = {
-  key: "auth",
+  key: "root", // ✅ root is better than "auth"
   storage,
-    whitelist: ["auth", "patientmedicine"], // 👈 optionally persist both
+  whitelist: ["auth", "patientmedicine", "patient"], // ✅ Add "patient" here
 };
+
 
 // const persistConfig = {
 //   key: "root",
@@ -17,7 +25,8 @@ const persistConfig = {
 // };
 const rootReducer = combineReducers({
 auth: authReducer,
-patientmedicine:patientMedicineReducer 
+patientmedicine:patientMedicineReducer ,
+patient:patientReducer 
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

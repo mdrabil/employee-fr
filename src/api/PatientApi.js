@@ -82,6 +82,24 @@ export const GetAllPatients = async () => {
   }
 };
 
+export const GetAllPatientsBySearch = async (searchQuery = {}) => {
+  try {
+    const response = await axiosInstance.get("/patients", {
+      params: searchQuery, // 🔍 send { name, phone } as query params
+    });
+
+    // Sort by createdAt (latest first)
+    const sortedData = response?.data?.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    
+    return sortedData;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
+
+
 // ✅ 2. Get a single patient by ID
 export const GetSinglePatient = async (id) => {
   try {

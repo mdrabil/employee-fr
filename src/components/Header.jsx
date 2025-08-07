@@ -2,6 +2,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../redux/authSlice";
+import socket from "../socket/socket";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -10,12 +11,15 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+      socket.emit("user_disconnected");
+  socket.disconnect();
+
     navigate("/login");
   };
 
   return (
     <header className="bg-[#B5B1B1] text-white px-6 py-4 shadow-md">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="flex justify-between items-center gap-4">
         {/* Logo/Title */}
         <h1 className="text-3xl font-extrabold tracking-wide flex items-center gap-2">
           🩺 <span>DR HAKIM</span>

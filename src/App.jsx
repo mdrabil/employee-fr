@@ -9,6 +9,9 @@ import User_Details from "./pages/User_Details";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./redux/store"; // ✅ import your store & persistor
+import AllTreatmentsPage from "./pages/AllTritments";
+import MedicineTable from "./pages/MedicineTable";
+import AddMedicine from "./components/addmedicine";
 
 const App = () => {
   return (
@@ -18,9 +21,15 @@ const App = () => {
           <MainLayouts>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/book" element={<BookAppoitment />} />
-              <Route path="/dashboard" element={<ListOfPaitent />} />
+              <Route path="/book_appointment" element={<BookAppoitment />} />
+              <Route path="/" element={<ListOfPaitent />} />
               <Route path="/user_details/:UserId" element={<User_Details />} />
+              <Route path="/treatments" element={<AllTreatmentsPage />} />
+           
+<Route path="/treatments/:id" element={<AllTreatmentsPage />} />
+
+              <Route path="/medicines" element={<MedicineTable/>} />
+              <Route path="/add-medicines" element={<AddMedicine/>} />
             </Routes>
           </MainLayouts>
         </BrowserRouter>
