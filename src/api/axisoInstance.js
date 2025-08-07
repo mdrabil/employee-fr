@@ -3,7 +3,7 @@ import { store } from "../redux/store";
 // import store from "../app/store";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://crm-be-13lj.onrender.com/api",
 });
 
 axiosInstance.interceptors.request.use((config) => {
