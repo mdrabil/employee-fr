@@ -12,6 +12,7 @@ import { store, persistor } from "./redux/store"; // ✅ import your store & per
 import AllTreatmentsPage from "./pages/AllTritments";
 import MedicineTable from "./pages/MedicineTable";
 import AddMedicine from "./components/AddMedicine";
+import LoadingOverlay from "./components/overlayloading/LdingOverlay;";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <MainLayouts>
+                 <LoadingOverlay />
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/book_appointment" element={<BookAppoitment />} />

@@ -4,30 +4,38 @@ import footerImg from '../assets/images/footer.jpg';
 import { useEffect } from 'react';
 import { IoIosCloseCircle } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
-const PriviewData = ({ userInformation, addmedicines, open, close }) => {
+import { DeleteAllMedicinesForPatient } from '../redux/Pmedicine';
+import { useDispatch } from 'react-redux';
+const PriviewData = ({ userInformation, addmedicines, open, close, printview,setprintview }) => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
-  const now = new Date();
-  const formatted = `${now.getDate().toString().padStart(2, '0')}/${
-    (now.getMonth() + 1).toString().padStart(2, '0')
-  }/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now
+
+  useEffect(() => {
+    if (printview) {
+      const timer = setTimeout(() => {
+        window.print()
+      }, 500)
+
+      window.onafterprint = () => {
+        dispatch(DeleteAllMedicinesForPatient(userInformation?._id))
+        setprintview(false)
+        navigate('/')
+      }
+
+      return () => {
+        clearTimeout(timer)
+        window.onafterprint = null
+      }
+    }
+  }, [printview, dispatch, navigate, userInformation])
+
+  const now = new Date()
+  const formatted = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1)
+    .toString()
+    .padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now
     .getMinutes()
     .toString()
-    .padStart(2, '0')}`;
-
-  // const formattedDate = (dateString) => {
-  //   if (!dateString) return '';
-  //   const date = new Date(dateString);
-  //   const day = date.getDate().toString().padStart(2, '0');
-  //   const month = date.toLocaleString('default', { month: 'short' });
-  //   const year = date.getFullYear();
-  //   return `${day} ${month} ${year}`;
-  // };
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     window.print();
-  //   }, 500);
-  // }, []);
+    .padStart(2, '0')}`
 
     useEffect(() => {
     // Wait 500ms for rendering to complete

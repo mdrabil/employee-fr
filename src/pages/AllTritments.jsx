@@ -10,11 +10,11 @@ const AllTreatments = () => {
   const { id } = useParams(); // 👈 get ID from route
   const [treatments, setTreatments] = useState([])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = id 
-          ? await GetSinglePatientTreatment(id)
+  const fetchData = async () => {
+    
+    try {
+      const data = id 
+      ? await GetSinglePatientTreatment(id)
           : await GetAllPatientTreatment();
 
         // If API for single returns an object, wrap it in array
@@ -24,6 +24,7 @@ const AllTreatments = () => {
         console.error(err);
       }
     };
+    useEffect(() => {
 
     fetchData();
   }, [id]);

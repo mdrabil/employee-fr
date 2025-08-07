@@ -45,7 +45,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-100 to-orange-200">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-100 to-orange-200 p-2">
       <div className="bg-white shadow-xl rounded-lg p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-orange-600 flex items-center justify-center gap-4">
          <span><IoLockClosed/> </span> DR HAKIM KLINIC <span><IoLockOpen/></span>

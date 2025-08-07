@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import socket from '../socket/socket';
 import { AddPatient } from '../redux/InitialPatient';
+import { store } from '../redux/store';
+import { setLoading } from '../redux/LoadingSlice';
 
 const ListOfPatient = () => {
   const user = useSelector(state=>state?.auth?.user)
@@ -18,6 +20,7 @@ const ListOfPatient = () => {
   const [error, setError] = useState("");
 const navigate = useNavigate()
 const fetchPatients = async () => {
+   store.dispatch(setLoading(true));
     try {
         const data = await GetTodayPatient();
         setPatients(data);
@@ -25,7 +28,9 @@ const fetchPatients = async () => {
         setError("");
       } catch (err) {
         setError(err.message);
-      }
+      }finally {
+    store.dispatch(setLoading(false));
+  }
     };
 
 
@@ -96,7 +101,7 @@ const handleCheck = (data) => {
 };
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-4 space-y-6 min-h-screen">
       {/* Stat Boxes */}
 
 
