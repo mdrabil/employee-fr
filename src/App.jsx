@@ -11,7 +11,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./redux/store"; // ✅ import your store & persistor
 import AllTreatmentsPage from "./pages/AllTritments";
 import MedicineTable from "./pages/MedicineTable";
-import AddMedicine from "./components/addmedicine";
+import AddMedicine from "./components/AddMedicine";
 
 const App = () => {
   return (
