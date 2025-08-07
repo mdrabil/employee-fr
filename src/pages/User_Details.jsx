@@ -434,6 +434,7 @@ const handleDoneTreatment = async () => {
 // const data= true
     if (data) {
       toast.success("इलाज सफलतापूर्वक दर्ज हो गया!");
+
       // dispatch(DeleteAllMedicinesForPatient(UserId));
       dispatch(DeletePatient())
       setTimeout(() => {
@@ -441,6 +442,7 @@ const handleDoneTreatment = async () => {
         // navigate('/')
         setPatientsPrint(true)
       }, 500);
+
     }
   } catch (error) {
     console.error("Treatment error:", error.message);

@@ -37,6 +37,23 @@ const PriviewData = ({ userInformation, addmedicines, open, close, printview,set
     .toString()
     .padStart(2, '0')}`
 
+    useEffect(() => {
+    // Wait 500ms for rendering to complete
+    const timer = setTimeout(() => {
+      window.print();
+    }, 500);
+
+    // Navigate after print
+    window.onafterprint = () => {
+      navigate('/');
+    };
+
+    return () => {
+      clearTimeout(timer);
+      window.onafterprint = null; // cleanup
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center w-full bg-white print:bg-white">
       <div className="w-full min-h-[297mm] relative shadow-lg bg-white p-2 print:p-0 relative">
