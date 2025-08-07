@@ -4,6 +4,9 @@ import { toast } from 'react-toastify';
 import { formatDateTime } from '../api/CustomApi';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
+import { store } from '../redux/store';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../redux/LoadingSlice';
 
 const MedicineTable = () => {
   const [showModal, setShowModal] = useState(false);
@@ -12,14 +15,17 @@ const MedicineTable = () => {
   const [filteredMedicines, setFilteredMedicines] = useState([]);
   const [search, setSearch] = useState("");
   const [showExpired, setShowExpired] = useState(false);
-
+const dispatch = useDispatch()
   // Get All Medicines
   const fetchData = async () => {
+      store.dispatch(setLoading(true));
     try {
       const data = await GetAllMedicine();
       setAllMedicines(data || []);
     } catch (err) {
       toast.error("Failed to fetch medicines");
+    } finally {
+        store.dispatch(setLoading(false));
     }
   };
 

@@ -4,14 +4,18 @@ import { GetAllPatientTreatment, GetSinglePatientTreatment } from '../api/Treatm
 // 👇 import the function you already wrote
 import { formatFrequency } from '../utils/dawatimes'
 import { useNavigate, useParams } from 'react-router-dom';
+import { store } from '../redux/store';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../redux/LoadingSlice';
 
 const AllTreatments = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const { id } = useParams(); // 👈 get ID from route
   const [treatments, setTreatments] = useState([])
 
   const fetchData = async () => {
-    
+      store.dispatch(setLoading(true));
     try {
       const data = id 
       ? await GetSinglePatientTreatment(id)
@@ -22,6 +26,8 @@ const AllTreatments = () => {
         setTreatments(Array.isArray(data) ? data : [data]);
       } catch (err) {
         console.error(err);
+      } finally {
+          store.dispatch(setLoading(false));
       }
     };
     useEffect(() => {

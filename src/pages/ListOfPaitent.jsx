@@ -180,10 +180,10 @@ const handleCheck = (data) => {
 
       return (
         <tr key={p._id || index} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
-          <td className="py-2 px-4">{p.patientCode}</td>
-          <td className="py-2 px-4 text-center">{p.patientName}</td>
-          <td className="py-2 px-4 text-center capitalize">{formatDate(p?.createdAt)}</td>
-        <td className="py-2 px-4">
+          <td className="py-2 ">{p.patientCode}</td>
+          <td className="py-2  text-center">{p.patientName}</td>
+          <td className="py-2  text-center capitalize">{formatDate(p?.createdAt)}</td>
+        <td className="py-2 ">
   {user?.user?.role?.name === 'admin' ? (
     <button
       onClick={() => handleCheck(p)}
