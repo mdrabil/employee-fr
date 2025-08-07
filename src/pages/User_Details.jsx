@@ -15,7 +15,7 @@ const User_Details = () => {
   const isTabletOrBelow = useMediaQuery('(max-width: 768px)');
 
   const patientmedicine = useSelector(
-    (state) => state.patientmedicine.patientmedicine[UserId] || []
+    (state) => state?.patientmedicine?.patientmedicine?.[UserId] || []
   );
   const navigate = useNavigate();
 
@@ -427,7 +427,7 @@ const handleDoneTreatment = async () => {
       toast.success("इलाज सफलतापूर्वक दर्ज हो गया!");
       dispatch(DeleteAllMedicinesForPatient(UserId));
       dispatch(DeletePatient())
-
+navigate('/')
     //   setTimeout(() => {
     //     setShowPriviewData(true);
     //   }, 500);
@@ -447,12 +447,12 @@ const handleDoneTreatment = async () => {
     return <p>Loading...</p>;
   }
   return (
-    <div className="p-6  mx-auto  from-green-50 to-white shadow-lg rounded-lg space-y-6 mt-6" style={{
+    <div className="p-6  mx-auto  from-green-50 to-white shadow-lg rounded-lg space-y-6 mt-2" style={{
       display:'flex',
       flexDirection:isTabletOrBelow ?'column' : '',
       width:'100%',
       // backgroundColor:'red',
-      gap:'50px'
+      gap:'30px'
     }}>
       {/* Patient Info */}
   <div style={{
@@ -472,8 +472,9 @@ const handleDoneTreatment = async () => {
         <label className="block mb-1 mt-3 text-sm font-medium text-gray-700">📝 Kya hua hai?</label>
         <textarea
           placeholder="Symptoms..."
-          className="w-full border-2 border-green-300 p-3 rounded h-24 resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="w-full border-2 border-green-300 p-3 rounded  resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
           value={symptoms}
+          rows={2}
           onChange={(e) => setSymptoms(e.target.value)}
         />
       </div>

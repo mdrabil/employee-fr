@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import socket from '../socket/socket';
 import { AddPatient } from '../redux/InitialPatient';
-
+import BookAppoitmennt from '../pages/BookAppoitment'
 const ListOfPatient = () => {
   const user = useSelector(state=>state?.auth?.user)
 
@@ -95,26 +95,47 @@ const handleCheck = (data) => {
   // Save in redux
 };
 
+
+  const [activeTab, setActiveTab] = useState('booked'); // Default active
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    // navigate(path);
+  };
+
+
   return (
     <div className="p-4 space-y-6">
       {/* Stat Boxes */}
 
 
-{user?.user?.role?.name==='receptionist' &&    <div className="flex justify-center items-center gap-4 my-4">
-      <button
-        onClick={() => navigate('/')}
-        className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-      >
-        Booked Appointment
-      </button>
+ <>
+      {user?.user?.role?.name === 'receptionist' && (
+        <div className="flex justify-center items-center gap-4 my-4">
+          <button
+            onClick={() => handleTabClick('booked')}
+            className={`px-5 py-2 rounded transition ${
+              activeTab === 'booked'
+                ? 'bg-blue-700 text-white'
+                : 'bg-blue-500 text-white hover:bg-blue-600'
+            }`}
+          >
+            Booked Appointment
+          </button>
 
-      <button
-        onClick={() => navigate('/book_appointment')}
-        className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-      >
-        Book Appointment
-      </button>
-    </div>}
+          <button
+            onClick={() => handleTabClick('book')}
+            className={`px-5 py-2 rounded transition ${
+              activeTab === 'book'
+                ? 'bg-green-700 text-white'
+                : 'bg-green-500 text-white hover:bg-green-600'
+            }`}
+          >
+            Book Appointment
+          </button>
+        </div>
+      )}
+    </>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-green-100 text-green-800 p-4 rounded shadow text-center">
           <h2 className="text-xl font-bold">{totalPatients}</h2>
@@ -134,8 +155,8 @@ const handleCheck = (data) => {
         </div>
       </div>
 
-      {/* Patient List & Side Panel */}
-      <div className="flex flex-col lg:flex-row gap-6">
+     
+    {activeTab==='booked' &&   <div className="flex flex-col lg:flex-row gap-6">
         {/* Patient Table */}
         <div className="bg-white shadow-md rounded-lg overflow-x-auto w-full lg:w-3/4">
           <table className="min-w-full text-center">
@@ -209,7 +230,9 @@ const handleCheck = (data) => {
        <PatientData 
     //  selectedPatient={selectedPatient}
        />
-      </div>
+      </div>}
+
+      {activeTab==='book' && < BookAppoitmennt />}
     </div>
   );
 };

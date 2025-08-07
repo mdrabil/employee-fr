@@ -34,7 +34,10 @@ const AllTreatments = () => {
         <h2 className="text-2xl font-bold mb-4 text-center">All Treatments</h2>
         <h2 className="text-2xl font-bold mb-4 text-center" onClick={()=>navigate(-1)}>Back</h2>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+     {treatments?.length === 0 ? <>
+     <div>
+      <h2>No Any Treatmenst Founds</h2>
+      </div></> :  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {treatments.map((treatment, index) => (
           <div
             key={index}
@@ -81,7 +84,7 @@ const AllTreatments = () => {
             </p>
           </div>
         ))}
-      </div>
+      </div>}
     </div>
   )
 }

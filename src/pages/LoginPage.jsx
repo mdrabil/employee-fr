@@ -5,6 +5,7 @@ import { loginFail, loginStart, loginSuccess } from "../redux/authSlice";
 import { loginUser } from "../api/authService";
 import { useNavigate } from "react-router-dom";
 import socket from "../socket/socket";
+import { IoLockClosed, IoLockOpen } from "react-icons/io5";
 
 const LoginPage = () => {
   // const [form, setForm] = useState({
@@ -46,8 +47,8 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-100 to-orange-200">
       <div className="bg-white shadow-xl rounded-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-orange-600">
-          Login
+        <h2 className="text-2xl font-bold mb-6 text-center text-orange-600 flex items-center justify-center gap-4">
+         <span><IoLockClosed/> </span> DR HAKIM KLINIC <span><IoLockOpen/></span>
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* <div>

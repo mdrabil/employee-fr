@@ -19,27 +19,52 @@ const PatientMedicine = createSlice({
       state.loading = false;
     },
 
-    AddPatientMedicine: (state, action) => {
-      const { patientId, name, dose, frequency,type } = action.payload;
-console.log('patientid',patientId)
-console.log('name',name)
+//     AddPatientMedicine: (state, action) => {
+//       const { patientId, name, dose, frequency,type } = action.payload;
+// console.log('patientid',patientId)
+// console.log('name',name)
 
-      if (!Array.isArray(state.patientmedicine[patientId])) {
-        state.patientmedicine[patientId] = [];
-      }
+//       if (!Array.isArray(state.patientmedicine[patientId])) {
+//         state.patientmedicine[patientId] = [];
+//       }
 
-      const index = state.patientmedicine[patientId].findIndex(
-        (med) => med.name === name
-      );
+//       const index = state.patientmedicine[patientId].findIndex(
+//         (med) => med.name === name
+//       );
 
-      if (index !== -1) {
-        state.patientmedicine[patientId][index] = { name, dose, frequency,type };
-      } else {
-        state.patientmedicine[patientId].push({ name, dose, frequency,type });
-      }
+//       if (index !== -1) {
+//         state.patientmedicine[patientId][index] = { name, dose, frequency,type };
+//       } else {
+//         state.patientmedicine[patientId].push({ name, dose, frequency,type });
+//       }
 
-      state.loading = false;
-    },
+//       state.loading = false;
+//     },
+
+AddPatientMedicine: (state, action) => {
+  const { patientId, name, dose, frequency, type } = action.payload;
+
+  if (!state.patientmedicine || typeof state.patientmedicine !== 'object') {
+    state.patientmedicine = {}; // Reset if corrupted
+  }
+
+  if (!Array.isArray(state.patientmedicine[patientId])) {
+    state.patientmedicine[patientId] = [];
+  }
+
+  const index = state.patientmedicine[patientId].findIndex(
+    (med) => med.name === name
+  );
+
+  if (index !== -1) {
+    state.patientmedicine[patientId][index] = { name, dose, frequency, type };
+  } else {
+    state.patientmedicine[patientId].push({ name, dose, frequency, type });
+  }
+
+  state.loading = false;
+}
+,
 
     EditPatientMedicine: (state, action) => {
       const { patientId, name, updatedMedicine } = action.payload;

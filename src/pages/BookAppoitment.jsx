@@ -16,7 +16,7 @@ const [form, setForm] = useState({
   patientCode: "", // You can auto-generate or input manually
   // fixedPermanentId:''
 });
-
+const navigate = useNavigate()
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -44,6 +44,7 @@ const [form, setForm] = useState({
       gender: "",
       patientCode: "",
     });
+    navigate('/')
   } catch (err) {
     // Error already handled with toast inside CreatePatient
     console.log("Create failed:", err.message);
@@ -56,7 +57,7 @@ const [patients, setPatients] = useState([]);
 const [searchName, setSearchName] = useState("");
 const [searchPhone, setSearchPhone] = useState("");
 const [searchPatientCode, setSearchPatientCode] = useState("");
-const navigate =useNavigate()
+
 // Fetch all patients once
 const fetchPatients = async () => {
   const data = await GetAllPatients();
@@ -355,8 +356,8 @@ const fillForm = (matched) => {
           </div>
          </div>
 
-        <div className="flex items-center gap-5 p-5">
-     <div className="flex items-center gap-5 p-5">
+        <div className="flex items-center gap-5 pb-2">
+     <div className="flex items-center gap-5">
   <button
     type="button"
     className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded transition"
