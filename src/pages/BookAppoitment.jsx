@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
-import { CreatePatient, GetAllPatients, GetAllPatientsBySearch } from "../api/PatientApi";
+import { CreatePatient, GetAllPatients } from "../api/PatientApi";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { store } from "../redux/store";
+import { useDispatch } from "react-redux";
+import { setLoading } from "../redux/LoadingSlice";
 const BookAppoitment = () => {
+
 const [form, setForm] = useState({
   patientName: "",
   dateOfBirth: "",
@@ -17,7 +21,7 @@ const [form, setForm] = useState({
   // fixedPermanentId:''
 });
 const navigate = useNavigate()
-
+const dispatch = useDispatch()
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
@@ -31,6 +35,8 @@ const navigate = useNavigate()
     toast.error('Reason for visit must be at least 3 characters');
     return;
   }
+
+    store.dispatch(setLoading(true));
   try {
     await CreatePatient(form); // form = patient form data
     toast.success("Patient appointment booked!");
@@ -48,6 +54,8 @@ const navigate = useNavigate()
   } catch (err) {
     // Error already handled with toast inside CreatePatient
     console.log("Create failed:", err.message);
+  }finally {
+    store.dispatch(setLoading(false));
   }
 };
 
@@ -60,11 +68,12 @@ const [searchPatientCode, setSearchPatientCode] = useState("");
 
 // Fetch all patients once
 const fetchPatients = async () => {
+  
   const data = await GetAllPatients();
   if (data.length > 0) {
     setAllPatients(data);
     setPatients(data); // show all initially
-  }
+  } 
 };
 
 useEffect(() => {

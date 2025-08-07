@@ -6,6 +6,7 @@ import { combineReducers } from "redux";
 // import { thunk } from "redux-thunk"; // ✅ FIXED
 import patientMedicineReducer  from './Pmedicine.js'
 import patientReducer  from './InitialPatient.js'
+import loadingReducer  from './LoadingSlice.js'
 
 // const persistConfig = {
 //   key: "auth",
@@ -26,7 +27,8 @@ const persistConfig = {
 const rootReducer = combineReducers({
 auth: authReducer,
 patientmedicine:patientMedicineReducer ,
-patient:patientReducer 
+patient:patientReducer,
+  loading: loadingReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

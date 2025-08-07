@@ -57,7 +57,7 @@ const Layout = ({ children }) => {
       {showLayout && <Sidebar />}
       <div className="flex-1 flex flex-col">
         {showHeader && <Header />}
-        <main className="p-2 overflow-auto shadow-md rounded-md bg-white">{children}</main>
+        <main className="p-2 overflow-auto shadow-md rounded-md bg-white min-h-screen">{children}</main>
       </div>
     </div>
   );

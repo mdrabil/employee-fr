@@ -10,6 +10,8 @@ import { toast } from 'react-toastify';
 import { createTreatment } from '../api/TreatmentApi';
 import { useMediaQuery } from '@mui/material';
 import { DeletePatient } from '../redux/InitialPatient';
+import { setLoading } from '../redux/LoadingSlice';
+import { store } from '../redux/store';
 const User_Details = () => {
   const { UserId } = useParams();
   const isTabletOrBelow = useMediaQuery('(max-width: 768px)');
@@ -20,6 +22,7 @@ const User_Details = () => {
   const navigate = useNavigate();
 
   const [patient, setPatients] = useState(null);
+  const [patientPrint, setPatientsPrint] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState('');
   const [selectedDawaList, setSelectedDawaList] = useState([]);
@@ -157,6 +160,7 @@ const handleAddMedicine = () => {
 
 
     const fetchMedicine = async () => {
+          store.dispatch(setLoading(true));
       try {
         const data = await GetAllMedicine();
         if (data) {
@@ -167,6 +171,8 @@ const handleAddMedicine = () => {
         console.error("Medicine fetch error:", err.message);
         // setError(err.message);
         // navigate("/404"); ❌ Don't navigate here
+      } finally {
+            store.dispatch(setLoading(false));
       }
     };
 
@@ -191,6 +197,7 @@ const handleAddMedicine = () => {
     // };
 
     const fetchPatients = async () => {
+          store.dispatch(setLoading(true));
   try {
     if (!UserId) {
       setError("Invalid User ID");
@@ -207,6 +214,8 @@ const handleAddMedicine = () => {
     console.error("Fetch patient failed:", err);
     setError("Patient fetch failed");
     navigate("/404");
+  } finally {
+        store.dispatch(setLoading(false));
   }
 };
 
@@ -425,11 +434,12 @@ const handleDoneTreatment = async () => {
 // const data= true
     if (data) {
       toast.success("इलाज सफलतापूर्वक दर्ज हो गया!");
-      dispatch(DeleteAllMedicinesForPatient(UserId));
+      // dispatch(DeleteAllMedicinesForPatient(UserId));
       dispatch(DeletePatient())
-navigate('/')
       setTimeout(() => {
         setShowPriviewData(true);
+        // navigate('/')
+        setPatientsPrint(true)
       }, 500);
     }
   } catch (error) {
@@ -443,9 +453,7 @@ navigate('/')
     return <p className="text-red-500">{error}</p>;
   }
 
-  if (!patient) {
-    return <p>Loading...</p>;
-  }
+
   return (
     <div className="p-6  mx-auto  from-green-50 to-white shadow-lg rounded-lg space-y-6 mt-2" style={{
       display:'flex',
@@ -674,6 +682,8 @@ navigate('/')
     <div className="bg-white max-h-[95vh] overflow-y-auto rounded-lg shadow-xl w-full max-w-4xl">
       <PriviewData
         userInformation={patient}
+        printview={patientPrint}
+        setprintview={setPatientsPrint}
         addmedicines={patientmedicine}
         open={showPriviewData}
         close={() => setShowPriviewData(false)}
