@@ -426,11 +426,11 @@ const handleDoneTreatment = async () => {
     if (data) {
       toast.success("इलाज सफलतापूर्वक दर्ज हो गया!");
       dispatch(DeleteAllMedicinesForPatient(UserId));
-      dispatch(DeletePatient())
-navigate('/')
+      // dispatch(DeletePatient())
       setTimeout(() => {
         setShowPriviewData(true);
       }, 500);
+// navigate('/')
     }
   } catch (error) {
     console.error("Treatment error:", error.message);
