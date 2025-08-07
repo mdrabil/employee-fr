@@ -428,9 +428,9 @@ const handleDoneTreatment = async () => {
       dispatch(DeleteAllMedicinesForPatient(UserId));
       dispatch(DeletePatient())
 navigate('/')
-    //   setTimeout(() => {
-    //     setShowPriviewData(true);
-    //   }, 500);
+      setTimeout(() => {
+        setShowPriviewData(true);
+      }, 500);
     }
   } catch (error) {
     console.error("Treatment error:", error.message);
