@@ -3,7 +3,7 @@ import { IoClose } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const UserProfile = () => {
+const UserProfiles = () => {
     const navigate = useNavigate()
   const user = useSelector((state) => state?.auth?.user?.user);
   console.log("user profile", user);
@@ -72,4 +72,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default UserProfiles;

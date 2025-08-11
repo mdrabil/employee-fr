@@ -16,7 +16,7 @@ import LoadingOverlay from "./components/overlayloading/LdingOverlay;";
 import Users from "./pages/Users";
 import TermsCondition from "./pages/TermsCondition";
 import RolePermissions from "./pages/Roles";
-import UserProfile from "./pages/userProfile";
+import UserProfile from "./pages/UsersProfile";
 
 const App = () => {
   return (
