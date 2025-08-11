@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { store } from '../redux/store';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../redux/LoadingSlice';
+import { IoClose } from 'react-icons/io5';
 
 const AllTreatments = () => {
   const navigate = useNavigate()
@@ -38,8 +39,8 @@ const AllTreatments = () => {
   return (
     <div className="p-4">
       <div className='flex gap-30 justify-between px-5'>
-        <h2 className="text-2xl font-bold mb-4 text-center">All Treatments</h2>
-        <h2 className="text-2xl font-bold mb-4 text-center" onClick={()=>navigate(-1)}>Back</h2>
+        <h2 className="text-xl font-bold mb-4 text-center">All Treatments</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center" onClick={()=>navigate(-1)}><IoClose/></h2>
       </div>
      {treatments?.length === 0 ? <>
      <div>

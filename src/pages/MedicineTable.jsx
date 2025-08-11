@@ -245,6 +245,31 @@ const dispatch = useDispatch()
                   className="w-full p-2 border rounded text-sm md:text-base"
                 />
               </div>
+
+              
+        {/* Mfg Date */}
+        <div>
+          <label className="block text-sm md:text-base font-medium mb-1">Mfg Date</label>
+          <input
+            type="date"
+            name="mfgDate"
+            value={editData?.mfgDate ? moment(editData.mfgDate).format("YYYY-MM-DD") : ""}
+            onChange={handleChange}
+            className="w-full p-2 border rounded text-sm md:text-base"
+          />
+        </div>
+
+        {/* Expiry Date */}
+        <div>
+          <label className="block text-sm md:text-base font-medium mb-1">Expiry Date</label>
+          <input
+            type="date"
+            name="expireDate"
+            value={editData?.expireDate ? moment(editData.expireDate).format("YYYY-MM-DD") : ""}
+            onChange={handleChange}
+            className="w-full p-2 border rounded text-sm md:text-base"
+          />
+        </div>
               <div>
                 <label className="block text-sm md:text-base font-medium mb-1">Status</label>
                 <select

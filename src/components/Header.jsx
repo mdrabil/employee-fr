@@ -4,7 +4,7 @@ import { logout } from "../redux/authSlice";
 import socket from "../socket/socket";
 import { useState, useEffect } from "react";
 import { FaUserCircle, FaCaretDown } from "react-icons/fa";
-
+import imglogo from '../assets/images/hakim-logo1.png'
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -37,12 +37,21 @@ const Header = () => {
 
   return (
     <header className="w-full overflow-visible">
-      <div className="flex  sm:flex-row justify-between items-start sm:items-center gap-3 p-3 md:p-4 lg:p-5">
+      <div className="flex  sm:flex-row justify-between items-center sm:items-center gap-3 p-3 md:p-4 lg:p-5">
         {/* Logo */}
         <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-wide flex items-center gap-2 text-[#FDA600] flex-shrink-0">
-          <span className="text-xl sm:text-2xl">🩺</span>
-          <span className="hidden sm:inline">DR HAKIM</span>
-          <span className="sm:hidden">DR HAKIM</span>
+   
+          <span className="hidden sm:inline">
+            <img style={{
+              width:'175px'
+            }} src={imglogo} alt="" />
+          </span>
+          <span className="sm:hidden">
+            <img style={{
+              width:'100px'
+            }} src={imglogo} alt="" />
+          </span>
+
         </h1>
 
         {/* User Dropdown */}

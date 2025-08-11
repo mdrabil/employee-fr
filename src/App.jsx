@@ -17,6 +17,7 @@ import Users from "./pages/Users";
 import TermsCondition from "./pages/TermsCondition";
 import RolePermissions from "./pages/Roles";
 import UserProfile from "./pages/UsersProfile";
+import Dashboard from "./pages/Dashboard";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
                  <LoadingOverlay />
             <Routes>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/book_appointment" element={<BookAppoitment />} />
               <Route path="/" element={<ListOfPaitent />} />
               <Route path="/user_details/:UserId" element={<User_Details />} />

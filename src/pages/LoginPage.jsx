@@ -6,7 +6,7 @@ import { loginUser } from "../api/authService";
 import { useNavigate } from "react-router-dom";
 import socket from "../socket/socket";
 import { IoLockClosed, IoLockOpen } from "react-icons/io5";
-
+import imglogo from '../assets/images/hakim-logo1.png'
 const LoginPage = () => {
   // const [form, setForm] = useState({
   //   // name: "",
@@ -45,12 +45,14 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex items-center justify-center bg-gradient-to-r from-orange-100 to-orange-200 p-2 md:p-4">
-      <div className="bg-white shadow-xl rounded-lg p-4 md:p-6 lg:p-8 w-full max-w-sm md:max-w-md">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex items-center justify-center  p-2 md:p-4">
+      <div className="bg-white shadow-xl rounded-lg p-4 md:p-6 lg:p-8 w-full max-w-sm md:max-w-md" style={{
+        border:'1px solid green inset'
+      }}>
         <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-4 md:mb-6 text-center text-orange-600 flex items-center justify-center gap-2 md:gap-4">
-         <span className="text-lg md:text-xl"><IoLockClosed/></span> 
-         <span className="text-sm md:text-base lg:text-lg">DR HAKIM KLINIC</span> 
-         <span className="text-lg md:text-xl"><IoLockOpen/></span>
+         {/* <span className="text-lg md:text-xl"><IoLockClosed/></span>  */}
+         <span className="text-sm md:text-base lg:text-lg"><img src={imglogo} alt="" /></span> 
+         {/* <span className="text-lg md:text-xl"><IoLockOpen/></span> */}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
           {/* <div>
