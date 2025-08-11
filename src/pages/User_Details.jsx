@@ -12,6 +12,7 @@ import { useMediaQuery } from '@mui/material';
 import { DeletePatient } from '../redux/InitialPatient';
 import { setLoading } from '../redux/LoadingSlice';
 import { store } from '../redux/store';
+import PrintLayoutFinal from '../components/PrintLayoutFinal';
 const User_Details = () => {
   const { UserId } = useParams();
   const isTabletOrBelow = useMediaQuery('(max-width: 768px)');
@@ -429,24 +430,30 @@ const handleDoneTreatment = async () => {
   };
 
   console.log('data final jo backend me jayga',payload)
+
+        store.dispatch(setLoading(true));
+
   try {
     const data = await createTreatment(payload);
 // const data= true
     if (data) {
-      toast.success("इलाज सफलतापूर्वक दर्ज हो गया!");
+      // toast.success("इलाज सफलतापूर्वक दर्ज हो गया!");
 
       // dispatch(DeleteAllMedicinesForPatient(UserId));
       dispatch(DeletePatient())
-      setTimeout(() => {
-        setShowPriviewData(true);
+      
+        // setShowPriviewData(true);
         // navigate('/')
         setPatientsPrint(true)
-      }, 500);
+    
 
     }
   } catch (error) {
     console.error("Treatment error:", error.message);
     toast.error("ट्रीटमेंट सेव नहीं हो सका");
+  }
+  finally{
+          store.dispatch(setLoading(false));
   }
 };
 
@@ -684,11 +691,26 @@ const handleDoneTreatment = async () => {
     <div className="bg-white max-h-[95vh] overflow-y-auto rounded-lg shadow-xl w-full max-w-4xl">
       <PriviewData
         userInformation={patient}
+      
+        // setprintview={setPatientsPrint}
+        addmedicines={patientmedicine}
+        open={showPriviewData}
+        close={() => setShowPriviewData(false)}
+      />
+    </div>
+</div>
+)}
+
+{patientPrint  && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="bg-white max-h-[95vh] overflow-y-auto rounded-lg shadow-xl w-full max-w-4xl">
+      <PrintLayoutFinal
+        userInformation={patient}
         printview={patientPrint}
         setprintview={setPatientsPrint}
         addmedicines={patientmedicine}
         open={showPriviewData}
-        close={() => setShowPriviewData(false)}
+        close={() => setPatientsPrint(false)}
       />
     </div>
 </div>

@@ -6,28 +6,52 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import { DeleteAllMedicinesForPatient } from '../redux/Pmedicine';
 import { useDispatch } from 'react-redux';
+import { DeletePatient } from '../redux/InitialPatient';
 const PriviewData = ({ userInformation, addmedicines, open, close, printview,setprintview }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (printview) {
-      const timer = setTimeout(() => {
-        window.print()
-      }, 500)
+  // useEffect(() => {
+  //   if (printview) {
+  //     const timer = setTimeout(() => {
+  //       window.print()
+  //     }, 500)
 
-      window.onafterprint = () => {
-        dispatch(DeleteAllMedicinesForPatient(userInformation?._id))
-        setprintview(false)
-        navigate('/')
-      }
+  //     window.onafterprint = () => {
+  //       dispatch(DeleteAllMedicinesForPatient(userInformation?._id))
+  //       setprintview(false)
+  //       navigate('/')
+  //     }
 
-      return () => {
-        clearTimeout(timer)
-        window.onafterprint = null
-      }
-    }
-  }, [printview, dispatch, navigate, userInformation])
+  //     return () => {
+  //       clearTimeout(timer)
+  //       window.onafterprint = null
+  //     }
+  //   }
+  // }, [printview, dispatch, navigate, userInformation])
+
+//   useEffect(() => {
+//   let timer;
+
+//   if (printview) {
+//     timer = setTimeout(() => {
+//       window.print();
+//     }, 1000);
+
+//     window.onafterprint = () => {
+//       dispatch(DeleteAllMedicinesForPatient(userInformation?._id));
+//       dispatch(DeletePatient())
+//       setprintview(false); // printview reset after print
+//       navigate('/');
+//     };
+//   }
+
+//   return () => {
+//     if (timer) clearTimeout(timer);
+//     window.onafterprint = null; // cleanup
+//   };
+// }, [printview, dispatch, navigate, userInformation]);
+
 
   const now = new Date()
   const formatted = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1)
@@ -37,22 +61,7 @@ const PriviewData = ({ userInformation, addmedicines, open, close, printview,set
     .toString()
     .padStart(2, '0')}`
 
-    useEffect(() => {
-    // Wait 500ms for rendering to complete
-    const timer = setTimeout(() => {
-      window.print();
-    }, 500);
 
-    // Navigate after print
-    window.onafterprint = () => {
-      navigate('/');
-    };
-
-    return () => {
-      clearTimeout(timer);
-      window.onafterprint = null; // cleanup
-    };
-  }, []);
 
   return (
     <div className=" flex items-center justify-center w-full bg-white print:bg-white">
