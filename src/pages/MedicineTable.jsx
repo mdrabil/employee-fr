@@ -101,166 +101,178 @@ const dispatch = useDispatch()
   const expiredCount = medicines.filter((m) => isExpired(m.expireDate)).length;
 
   return (
-    <div className="p-4">
-      <div className="overflow-x-auto">
-        {/* Top Info Boxes */}
-       <div className='flex items-start justify-between'>
-         <div className="flex flex-wrap gap-4 mb-6">
-          <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded shadow w-full sm:w-auto">
-            <p className="font-bold text-lg">Total Medicines</p>
-            <p className="text-2xl">{medicines.length}</p>
+    <div className="w-full max-w-full overflow-x-hidden space-y-4 md:space-y-6">
+      {/* Top Info Boxes */}
+      <div className='flex flex-col lg:flex-row items-start justify-between gap-4'>
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full lg:w-auto">
+          <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-3 md:p-4 rounded shadow w-full sm:w-auto">
+            <p className="font-bold text-sm md:text-lg">Total Medicines</p>
+            <p className="text-xl md:text-2xl">{medicines.length}</p>
           </div>
 
           <div
             onClick={() => setShowExpired(!showExpired)}
-            className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow cursor-pointer w-full sm:w-auto hover:bg-red-200"
+            className="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 md:p-4 rounded shadow cursor-pointer w-full sm:w-auto hover:bg-red-200"
           >
-            <p className="font-bold text-lg">Expired Medicines</p>
-            <p className="text-2xl">{expiredCount}</p>
+            <p className="font-bold text-sm md:text-lg">Expired Medicines</p>
+            <p className="text-xl md:text-2xl">{expiredCount}</p>
           </div>
-
-         
         </div>
-         <Link
-            to="/add-medicines"
-            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 shadow w-full sm:w-auto text-center"
-          >
-            Add New Medicine
-          </Link>
-       </div>
+        
+        <Link
+          to="/add-medicines"
+          className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 shadow w-full sm:w-auto text-center text-sm md:text-base"
+        >
+          Add New Medicine
+        </Link>
+      </div>
         
 
-        {/* Search */}
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search by name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full md:w-1/2 p-2 border rounded shadow"
-          />
-        </div>
+      {/* Search */}
+      <div className="w-full">
+        <input
+          type="text"
+          placeholder="Search by name..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full p-2 md:p-3 border rounded shadow text-sm md:text-base"
+        />
+      </div>
 
-        {/* Table */}
-        <table className="min-w-full table-auto border border-gray-200">
-          <thead className="bg-green-500 text-white">
-            <tr>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Type</th>
-              <th className="px-4 py-2">Price</th>
-              <th className="px-4 py-2">Quantity</th>
-              <th className="px-4 py-2">Mfg Date</th>
-              <th className="px-4 py-2">Exp Date</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredMedicines.length > 0 ? (
-              filteredMedicines.map((med) => (
-                <tr
-                  key={med._id}
-                  className={`border-b text-sm ${isExpired(med.expireDate) ? 'text-red-600 font-semibold' : ''}`}
-                >
-                  <td className="px-4 py-2">{med.name}</td>
-                  <td className="px-4 py-2">{med.type}</td>
-                  <td className="px-4 py-2">₹{med.price}</td>
-                  <td className="px-4 py-2">{med.quantity}</td>
-                  <td className="px-4 py-2">{formatDateTime(med?.mfgDate)}</td>
-                  <td className="px-4 py-2">{formatDateTime(med?.expireDate)}</td>
-                  <td className="px-4 py-2">{med.status ? 'Available' : 'Unavailable'}</td>
-                  <td className="px-4 py-2 flex gap-2">
-                    <button
-                      onClick={() => handleEditClick(med)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(med._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
+      {/* Table */}
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="table-responsive">
+          <table className="min-w-full table-auto border border-gray-200">
+            <thead className="bg-green-500 text-white">
+              <tr>
+                <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Name</th>
+                <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Type</th>
+                <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Price</th>
+                <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Quantity</th>
+                <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Mfg Date</th>
+                <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Exp Date</th>
+                <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Status</th>
+                <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredMedicines.length > 0 ? (
+                filteredMedicines.map((med) => (
+                  <tr
+                    key={med._id}
+                    className={`border-b text-xs md:text-sm ${isExpired(med.expireDate) ? 'text-red-600 font-semibold' : ''}`}
+                  >
+                    <td className="px-2 md:px-4 py-2">{med.name}</td>
+                    <td className="px-2 md:px-4 py-2">{med.type}</td>
+                    <td className="px-2 md:px-4 py-2">₹{med.price}</td>
+                    <td className="px-2 md:px-4 py-2">{med.quantity}</td>
+                    <td className="px-2 md:px-4 py-2">{formatDateTime(med?.mfgDate)}</td>
+                    <td className="px-2 md:px-4 py-2">{formatDateTime(med?.expireDate)}</td>
+                    <td className="px-2 md:px-4 py-2">{med.status ? 'Available' : 'Unavailable'}</td>
+                    <td className="px-2 md:px-4 py-2">
+                      <div className="flex flex-col sm:flex-row gap-1 md:gap-2">
+                        <button
+                          onClick={() => handleEditClick(med)}
+                          className="bg-blue-500 text-white px-2 md:px-3 py-1 rounded hover:bg-blue-600 text-xs md:text-sm"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(med._id)}
+                          className="bg-red-500 text-white px-2 md:px-3 py-1 rounded hover:bg-red-600 text-xs md:text-sm"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="text-center py-4 text-gray-400 text-sm md:text-base">
+                    No medicine data found.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="8" className="text-center py-4 text-gray-400">
-                  No medicine data found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
-            <h2 className="text-lg font-semibold mb-4">Edit Medicine</h2>
-            <div className="space-y-3">
-              <input
-                type="text"
-                name="name"
-                value={editData.name}
-                onChange={handleChange}
-                placeholder="Name"
-                className="w-full border p-2 rounded"
-              />
-              <input
-                type="text"
-                name="type"
-                value={editData.type}
-                onChange={handleChange}
-                placeholder="Type"
-                className="w-full border p-2 rounded"
-              />
-              <input
-                type="number"
-                name="price"
-                value={editData.price}
-                onChange={handleChange}
-                placeholder="Price"
-                className="w-full border p-2 rounded"
-              />
-              <input
-                type="number"
-                name="quantity"
-                value={editData.quantity}
-                onChange={handleChange}
-                placeholder="Quantity"
-                className="w-full border p-2 rounded"
-              />
-              <input
-                type="date"
-                name="mfgDate"
-                value={editData?.mfgDate?.slice(0, 10) || ''}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-              />
-              <input
-                type="date"
-                name="expireDate"
-                value={editData?.expireDate?.slice(0, 10) || ''}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-              />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-4 md:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg md:text-xl font-bold mb-4">Edit Medicine</h2>
+            <div className="space-y-3 md:space-y-4">
+              <div>
+                <label className="block text-sm md:text-base font-medium mb-1">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editData?.name || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded text-sm md:text-base"
+                />
+              </div>
+              <div>
+                <label className="block text-sm md:text-base font-medium mb-1">Type</label>
+                <input
+                  type="text"
+                  name="type"
+                  value={editData?.type || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded text-sm md:text-base"
+                />
+              </div>
+              <div>
+                <label className="block text-sm md:text-base font-medium mb-1">Price</label>
+                <input
+                  type="number"
+                  name="price"
+                  value={editData?.price || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded text-sm md:text-base"
+                />
+              </div>
+              <div>
+                <label className="block text-sm md:text-base font-medium mb-1">Quantity</label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={editData?.quantity || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded text-sm md:text-base"
+                />
+              </div>
+              <div>
+                <label className="block text-sm md:text-base font-medium mb-1">Status</label>
+                <select
+                  name="status"
+                  value={editData?.status || false}
+                  onChange={(e) => setEditData({ ...editData, status: e.target.value === 'true' })}
+                  className="w-full p-2 border rounded text-sm md:text-base"
+                >
+                  <option value="true">Available</option>
+                  <option value="false">Unavailable</option>
+                </select>
+              </div>
             </div>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setShowModal(false)}
-                className="bg-gray-300 px-4 py-1 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
+            <div className="flex gap-2 mt-4 md:mt-6">
               <button
                 onClick={() => handleSave(editData)}
-                className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
+                className="flex-1 bg-green-500 text-white py-2 rounded hover:bg-green-600 text-sm md:text-base"
               >
                 Save
+              </button>
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setEditData(null);
+                }}
+                className="flex-1 bg-gray-500 text-white py-2 rounded hover:bg-gray-600 text-sm md:text-base"
+              >
+                Cancel
               </button>
             </div>
           </div>

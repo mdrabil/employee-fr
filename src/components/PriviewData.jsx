@@ -55,7 +55,7 @@ const PriviewData = ({ userInformation, addmedicines, open, close, printview,set
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center w-full bg-white print:bg-white">
+    <div className=" flex items-center justify-center w-full bg-white print:bg-white">
       <div className="w-full min-h-[297mm] relative shadow-lg bg-white p-2 print:p-0 relative">
         {/* Header Image */}
         <div className="w-full top-0 right-0 print:w-full">

@@ -38,9 +38,9 @@ import { handleAxiosError } from "./handleAxiosError";
 // src/api/patient.js
 
 
-export const CreateMedicine = async (patientData) => {
+export const CreateUsers = async (patientData) => {
   try {
-    const response = await axiosInstance.post("/medicines", patientData);
+    const response = await axiosInstance.post("/users", patientData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -72,9 +72,9 @@ export const CreateMedicine = async (patientData) => {
 
 
 // ✅ 1. Get all patients
-export const GetAllMedicine = async () => {
+export const GetAllUsers = async () => {
   try {
-    const response = await axiosInstance.get("/medicines");
+    const response = await axiosInstance.get("/users");
     // Sort by createdAt (latest first)
     const sortedData = response?.data?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     return sortedData;
@@ -84,9 +84,9 @@ export const GetAllMedicine = async () => {
 };
 
 // ✅ 2. Get a single patient by ID
-export const GetSingleMedicine = async (id) => {
+export const GetSingleUsers= async (id) => {
   try {
-    const response = await axiosInstance.get(`/medicines/${id}`);
+    const response = await axiosInstance.get(`/users/${id}`);
     return response.data;
   } catch (error) {
     handleAxiosError(error);
@@ -94,9 +94,9 @@ export const GetSingleMedicine = async (id) => {
 };
 
 // ✅ 3. Update patient by ID
-export const UpdateMedicine = async (id, updateData) => {
+export const UpdateUsers = async (id, updateData) => {
   try {
-    const response = await axiosInstance.put(`/medicines/${id}`, updateData);
+    const response = await axiosInstance.put(`/users/${id}`, updateData);
     return response.data;
   } catch (error) {
     handleAxiosError(error);
@@ -104,9 +104,9 @@ export const UpdateMedicine = async (id, updateData) => {
 };
 
 // ✅ 4. Delete patient by ID
-export const DeleteMedicine = async (id) => {
+export const DeleteUsers = async (id) => {
   try {
-    const response = await axiosInstance.delete(`/medicines/${id}`);
+    const response = await axiosInstance.delete(`/users/${id}`);
     return response.data;
   } catch (error) {
     handleAxiosError(error);

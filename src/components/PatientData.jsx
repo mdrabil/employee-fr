@@ -4,6 +4,7 @@ import socket from '../socket/socket';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddPatient, DeletePatient } from '../redux/InitialPatient';
 import { IoClose } from 'react-icons/io5';
+
 const PatientData = () => {
     const user = useSelector(state=>state?.auth?.user)
   
@@ -39,54 +40,88 @@ const handleClose = () => {
   console.log('Redux Patient:', selectedPatient);
 
 
-  if (!selectedPatient) return <div className="text-gray-400 " style={{
-    width:'600px',
-    // backgroundColor:'red',
-    padding:'30px',
-    display:'flex',
-    alignItems:'center',
-    justifyContent:'center'
-  }}>No patient selected</div>;
+  if (!selectedPatient) return (
+    <div className="text-gray-400 w-full lg:w-auto p-4 md:p-6 lg:p-8 flex items-center justify-center min-h-[200px] bg-gray-50 rounded-lg">
+      <div className="text-center">
+        <p className="text-sm md:text-base">No patient selected</p>
+        <p className="text-xs md:text-sm text-gray-500 mt-1">Select a patient from the list to view details</p>
+      </div>
+    </div>
+  );
 
   return (
-    
- <>
-  <div className="bg-[#f0f9f4] p-4 rounded-lg shadow w-full lg:w-1/2 ">
-        <div className='flex items-center justify-between'>
-            <h2 className="text-lg font-bold mb-2 text-[#004B29]">
-            Patient Details</h2>
-              <h2 className="text-lg font-bold mb-2 text-[#004B29]">
-            {selectedPatient?.gender}</h2>
-           {role ==="admin" &&  <IoClose style={{
-            cursor:'pointer'
-           }} onClick={handleClose}/>}
+    <>
+      <div className="bg-[#f0f9f4] p-3 md:p-4 rounded-lg shadow w-full h-fit">
+        <div className='flex items-center justify-between mb-3'>
+          <h2 className="text-base md:text-lg font-bold text-[#004B29]">
+            Patient Details
+          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm md:text-base font-bold text-[#004B29]">
+              {selectedPatient?.gender}
+            </h2>
+            {role === "admin" && (
+              <IoClose 
+                className="cursor-pointer text-lg md:text-xl hover:text-red-500 transition-colors"
+                onClick={handleClose}
+              />
+            )}
+          </div>
         </div>
-          {selectedPatient ? (
-            <div className="space-y-2 text-sm text-gray-800">
-              <p><strong>ID:</strong> {selectedPatient?.patientCode}</p>
-              <p><strong>Name:</strong> {selectedPatient?.patientName}</p>
-              <p><strong>AGE:</strong> {selectedPatient?.age || 'N/A'}</p>
-              <p><strong>Problem:</strong> {selectedPatient?.reasonForVisit|| 'N/A'}</p>
-              <p><strong>Address:</strong> {selectedPatient?.address || 'N/A'}</p>
-              <p><strong>Phone:</strong> {selectedPatient?.phone || 'N/A'}</p>
+        
+        {selectedPatient ? (
+          <div className="space-y-2 md:space-y-3 text-xs md:text-sm text-gray-800">
+            <div className="grid grid-cols-1 gap-2">
+              <p className="flex flex-col sm:flex-row sm:items-center">
+                <strong className="text-[#004B29] min-w-[60px] sm:min-w-[80px]">ID:</strong> 
+                <span className="ml-0 sm:ml-2">{selectedPatient?.patientCode}</span>
+              </p>
+              <p className="flex flex-col sm:flex-row sm:items-center">
+                <strong className="text-[#004B29] min-w-[60px] sm:min-w-[80px]">Name:</strong> 
+                <span className="ml-0 sm:ml-2">{selectedPatient?.patientName}</span>
+              </p>
+              <p className="flex flex-col sm:flex-row sm:items-center">
+                <strong className="text-[#004B29] min-w-[60px] sm:min-w-[80px]">Age:</strong> 
+                <span className="ml-0 sm:ml-2">{selectedPatient?.age || 'N/A'}</span>
+              </p>
+              <p className="flex flex-col sm:flex-row sm:items-start">
+                <strong className="text-[#004B29] min-w-[60px] sm:min-w-[80px]">Problem:</strong> 
+                <span className="ml-0 sm:ml-2">{selectedPatient?.reasonForVisit || 'N/A'}</span>
+              </p>
+              <p className="flex flex-col sm:flex-row sm:items-start">
+                <strong className="text-[#004B29] min-w-[60px] sm:min-w-[80px]">Address:</strong> 
+                <span className="ml-0 sm:ml-2">{selectedPatient?.address || 'N/A'}</span>
+              </p>
+              <p className="flex flex-col sm:flex-row sm:items-center">
+                <strong className="text-[#004B29] min-w-[60px] sm:min-w-[80px]">Phone:</strong> 
+                <span className="ml-0 sm:ml-2">{selectedPatient?.phone || 'N/A'}</span>
+              </p>
+            </div>
 
-              {/* Buttons */}
-            
-            { role === "receptionist" ? "" :
-              <div className="pt-4 space-x-2">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm" onClick={()=>navigate(`/treatments/${selectedPatient?._id}`)}>
+            {/* Buttons */}
+            {role !== "receptionist" && (
+              <div className="pt-3 md:pt-4 space-y-2 sm:space-y-0 sm:space-x-2 sm:flex sm:flex-row flex-col">
+                <button 
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-xs md:text-sm transition-colors" 
+                  onClick={() => navigate(`/treatments/${selectedPatient?._id}`)}
+                >
                   Old Problem
                 </button>
-          {selectedPatient?.status==="treated" ?  "" :   <Link to={`/user_details/${selectedPatient?._id}`}>   <button className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
-                  Cheching
-                </button></Link> }
-              </div>}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-sm">Select a patient to view details.</p>
-          )}
-        </div>
- </>
+                {selectedPatient?.status !== "treated" && (
+                  <Link to={`/user_details/${selectedPatient?._id}`} className="block sm:inline">
+                    <button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-xs md:text-sm transition-colors">
+                      Checking
+                    </button>
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-xs md:text-sm">Select a patient to view details.</p>
+        )}
+      </div>
+    </>
   )
 }
 

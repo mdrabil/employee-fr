@@ -13,6 +13,10 @@ import AllTreatmentsPage from "./pages/AllTritments";
 import MedicineTable from "./pages/MedicineTable";
 import AddMedicine from "./components/AddMedicine";
 import LoadingOverlay from "./components/overlayloading/LdingOverlay;";
+import Users from "./pages/Users";
+import TermsCondition from "./pages/TermsCondition";
+import RolePermissions from "./pages/Roles";
+import UserProfile from "./pages/userProfile";
 
 const App = () => {
   return (
@@ -32,6 +36,10 @@ const App = () => {
 
               <Route path="/medicines" element={<MedicineTable/>} />
               <Route path="/add-medicines" element={<AddMedicine/>} />
+              <Route path="/users" element={<Users/>} />
+              <Route path="/terms_condition" element={<TermsCondition/>} />
+              <Route path="/roles" element={<RolePermissions/>} />
+              <Route path="/profile" element={<UserProfile/>} />
             </Routes>
           </MainLayouts>
         </BrowserRouter>
