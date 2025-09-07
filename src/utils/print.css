@@ -1,0 +1,15 @@
+  @media print {
+    body * {
+      visibility: hidden; /* sab hide */
+    }
+    .print-description, .print-description * {
+      visibility: visible; /* sirf description show */
+    }
+    .print-description {
+      /* position: absolute;
+      top: 0;
+      left: 0;
+      color: red; */
+      width: 100%;
+    }
+  }

@@ -7,6 +7,8 @@ import moment from 'moment';
 import { store } from '../redux/store';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../redux/LoadingSlice';
+import { MdDelete, MdEdit, MdOutlineEdit } from 'react-icons/md';
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const MedicineTable = () => {
   const [showModal, setShowModal] = useState(false);
@@ -143,7 +145,7 @@ const dispatch = useDispatch()
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="table-responsive">
           <table className="min-w-full table-auto border border-gray-200">
-            <thead className="bg-green-500 text-white">
+            <thead className="bg-blue-950 text-white">
               <tr>
                 <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Name</th>
                 <th className="px-2 md:px-4 py-2 text-xs md:text-sm">Type</th>
@@ -162,7 +164,7 @@ const dispatch = useDispatch()
                     key={med._id}
                     className={`border-b text-xs md:text-sm ${isExpired(med.expireDate) ? 'text-red-600 font-semibold' : ''}`}
                   >
-                    <td className="px-2 md:px-4 py-2">{med.name}</td>
+                    <td className="px-2 md:px-4 py-2 ">{med.name}</td>
                     <td className="px-2 md:px-4 py-2">{med.type}</td>
                     <td className="px-2 md:px-4 py-2">₹{med.price}</td>
                     <td className="px-2 md:px-4 py-2">{med.quantity}</td>
@@ -173,15 +175,16 @@ const dispatch = useDispatch()
                       <div className="flex flex-col sm:flex-row gap-1 md:gap-2">
                         <button
                           onClick={() => handleEditClick(med)}
-                          className="bg-blue-500 text-white px-2 md:px-3 py-1 rounded hover:bg-blue-600 text-xs md:text-sm"
+                          className=" text-black px-2 md:px-3 py-1 rounded  text-xs md:text-sm"
                         >
-                          Edit
+                        <MdOutlineEdit />
+  
                         </button>
                         <button
                           onClick={() => handleDelete(med._id)}
-                          className="bg-red-500 text-white px-2 md:px-3 py-1 rounded hover:bg-red-600 text-xs md:text-sm"
+                          className="text-red-500  px-2 md:px-3 py-1 rounded hover:text-red-600 text-xs md:text-sm"
                         >
-                          Delete
+                          <RiDeleteBin6Line/>
                         </button>
                       </div>
                     </td>

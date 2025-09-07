@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axisoInstance";
-import { handleAxiosError } from "./handleAxiosError";
+import { handleAxiosError } from "./apiErrorHander";
 
 //  export const GetTodayPatient = async () => {
 //   try {

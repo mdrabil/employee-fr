@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { store } from "../redux/store";
 import { setLoading } from "../redux/LoadingSlice";
-import { DeleteUsers, GetAllUsers, GetSingleUsers } from "../api/UsersApi";
+import { CreateUsers, DeleteUsers, GetAllUsers, GetSingleUsers } from "../api/UsersApi";
 import { GetAllRoles } from "../api/RolesApi";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -172,7 +172,7 @@ const handleAddSave = async () => {
 
   try {
     store.dispatch(setLoading(true));
-    const res = await CreateUser(newUserData); // <-- yeh API call banani hogi
+    const res = await CreateUsers(newUserData); // <-- yeh API call banani hogi
     if (res?.success) {
       toast.success("User added successfully!");
       setShowAddModal(false);

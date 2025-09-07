@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axisoInstance";
-import { handleAxiosError } from "./handleAxiosError";
+import { handleAxiosError } from "./apiErrorHander";
 
 //  export const GetTodayPatient = async () => {
 //   try {
@@ -40,7 +40,7 @@ import { handleAxiosError } from "./handleAxiosError";
 
 export const CreateUsers = async (patientData) => {
   try {
-    const response = await axiosInstance.post("/users", patientData);
+    const response = await axiosInstance.post("/auth/register", patientData);
     return response.data;
   } catch (error) {
     if (error.response) {

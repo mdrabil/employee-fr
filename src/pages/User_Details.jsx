@@ -13,6 +13,9 @@ import { DeletePatient } from '../redux/InitialPatient';
 import { setLoading } from '../redux/LoadingSlice';
 import { store } from '../redux/store';
 import PrintLayoutFinal from '../components/PrintLayoutFinal';
+import { FaAngleDoubleLeft } from 'react-icons/fa';
+import { MdDeleteOutline } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
 const User_Details = () => {
   const { UserId } = useParams();
   const isTabletOrBelow = useMediaQuery('(max-width: 768px)');
@@ -130,7 +133,17 @@ const handleAddMedicine = () => {
     med.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  console.log('dawa add ha ',patientmedicine)
+
+//   const filteredMedicines = medicines.filter((med) =>
+//   med.name.toLowerCase().includes(search.toLowerCase())
+// );
+
+useEffect(() => {
+  if (search?.length > 0) {
+    setSelectedMedicine(null);
+  }
+}, [search]);
+
  
 
   // const handleDelete = (index) => {
@@ -349,13 +362,39 @@ const handleEdit = (medicine) => {
 //   return parts.length > 0 ? parts.join(' | ') : '--';
 // };
 
+// const formatFrequency = (freq) => {
+//   if (!freq || typeof freq !== 'object') return '--';
+
+//   const parts = [];
+//   const mapTime = { सुबह: 'सुबह', दोपहर: 'दोपहर', रात: 'रात' };
+
+//   Object.keys(mapTime).forEach((time) => {
+//     const before = freq[time]?.beforeMeal;
+//     const after = freq[time]?.afterMeal;
+
+//     let meals = [];
+//     if (before) meals.push('खाने से पहले');
+//     if (after) meals.push('खाने के बाद');
+
+//     if (meals.length > 0) {
+//       parts.push(`${mapTime[time]}: ${meals.join(', ')}`);
+//     }
+//   });
+
+//   return parts.length > 0 ? parts.join(' | ') : '--';
+// };
+
+
 const formatFrequency = (freq) => {
   if (!freq || typeof freq !== 'object') return '--';
 
-  const parts = [];
-  const mapTime = { सुबह: 'सुबह', दोपहर: 'दोपहर', रात: 'रात' };
+  const mapTime = {
+    सुबह: { label: 'सुबह', color: 'text-green-600' },
+    दोपहर: { label: 'दोपहर', color: 'text-orange-500' },
+    रात: { label: 'रात', color: 'text-blue-600' },
+  };
 
-  Object.keys(mapTime).forEach((time) => {
+  return Object.keys(mapTime).map((time, idx) => {
     const before = freq[time]?.beforeMeal;
     const after = freq[time]?.afterMeal;
 
@@ -364,12 +403,18 @@ const formatFrequency = (freq) => {
     if (after) meals.push('खाने के बाद');
 
     if (meals.length > 0) {
-      parts.push(`${mapTime[time]}: ${meals.join(', ')}`);
+      return (
+        <div key={idx}>
+          <span className={mapTime[time].color}>{mapTime[time].label}:</span>{" "}
+          {meals.join(', ')}
+        </div>
+      );
     }
-  });
 
-  return parts.length > 0 ? parts.join(' | ') : '--';
+    return null;
+  });
 };
+
 
 
 
@@ -464,229 +509,347 @@ const handleDoneTreatment = async () => {
 
 
   return (
-    <div className="p-6  mx-auto  from-green-50 to-white shadow-lg rounded-lg space-y-6 mt-2" style={{
-      display:'flex',
-      flexDirection:isTabletOrBelow ?'column' : '',
-      width:'100%',
-      // backgroundColor:'red',
-      gap:'30px'
-    }}>
-      {/* Patient Info */}
-  <div style={{
-    width:'100%'
-  }}>
-        <div className="bg-green-100 p-2 rounded-lg">
-        <h2 className="text- font-bold text-green-900 mb-3">🧑‍⚕️ Patient Details</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 font-medium text-gray-700">
-          <div>Name: <span className="font-semibold text-black">{patient?.patientName}</span></div>
-          <div className='text-right pr-6'>Age: <span className="font-semibold text-black">{patient?.age}</span></div>
-          <div>Reason: <span className="font-semibold text-black">{patient?.reasonForVisit}</span></div>
+<div
+  className="p-1 mx-auto  mt-2 flex gap-6"
+  style={{
+    flexDirection: isTabletOrBelow ? "column" : "row",
+    // backgroundColor:'red',
+    width: "98%",
+  }}
+>
+  {/* Left Section */}
+  <div className="flex-1 min-h-[400px] bg-white rounded-lg  overflow-y-auto">
+    <div className="bg-green-100 p-2 rounded-lg border border-gray-200 rounded-lg">
+      <h2 className="font-bold text-green-900 mb-3">🧑‍⚕️ Patient Details</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 font-medium text-gray-700">
+        <div>
+          Name: <span className="font-semibold text-black">{patient?.patientName}</span>
+        </div>
+        <div className="text-right pr-6">
+          Age: <span className="font-semibold text-black">{patient?.age}</span>
+        </div>
+        <div>
+          Reason:{" "}
+          <span className="font-semibold text-black">{patient?.reasonForVisit}</span>
         </div>
       </div>
-
-      {/* Symptoms */}
-      <div>
-        <label className="block mb-1 mt-3 text-sm font-medium text-gray-700">📝 Kya hua hai?</label>
-        <textarea
-          placeholder="Symptoms..."
-          className="w-full border-2 border-green-300 p-3 rounded  resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={symptoms}
-          rows={2}
-          onChange={(e) => setSymptoms(e.target.value)}
-        />
-      </div>
-
-      {/* Search Medicine */}
-      <div>
-        <label className="block mb-1 mt-2 text-sm font-medium text-gray-700">🔍 Search Medicine</label>
-        <input
-          type="text"
-          placeholder="Type medicine name..."
-          className="border w-full p-3 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        {search && (
-          <div className="mt-2 border rounded p-2 bg-green-50 max-h-40 overflow-y-auto">
-            {filteredMedicines.length ? (
-              filteredMedicines.map((med, i) => (
-                <div
-                  key={i}
-                  className="cursor-pointer hover:bg-green-200 p-2 rounded text-sm transition"
-                  onClick={() => setSelectedMedicine(med)}
-                >
-                  {med.name}
-                </div>
-              ))
-            ) : (
-              <div className="text-sm text-gray-500">No medicine found</div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Show Dosage & Frequency */}
-      {selectedMedicine && (
-        <div className="border p-4 rounded bg-orange-50 space-y-4 shadow-md">
-          <h3 className="font-semibold text-lg text-orange-700">🧪 {selectedMedicine.name}</h3>
-
-     {
-      selectedMedicine?.type==='Syrup'  &&
-      <>
-            <p className="text-sm font-medium text-gray-700 mb-1">💧 Slect Dose:</p>
-           <div className="flex gap-4 flex-wrap">
-{doseOptions.map((dose, idx) => (
-  <label key={idx} className="flex items-center gap-2 cursor-pointer">
-    <input
-      type="radio"
-      name="dose"
-      value={dose}
-      checked={selectedDose === dose}
-      onChange={() => {}}
-      onClick={(e) => {
-        const clickedValue = e.target.value;
-        setSelectedDose((prev) => (prev === clickedValue ? '' : clickedValue));
-      }}
-    />
-    <span className="text-gray-700">{dose}</span>
-  </label>
-))}
-
-
     </div>
-          </>
-             } 
 
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-1">⏱️ Frequency:</p>
-            {/* <div className="" style={{
-              display:'grid',
-              gridTemplateColumns:"repeat(3,1fr)",
-              gap:'20px'
-            }}>
-              {['Naste Se Pahle', 'Naste ke Baad', 'Dophar:Khane Se Pahle',"Dophar:Khane Ke Baad","Rat:Khane Se Pahle","Raat:Khane Ke Baad"].map((freq, idx) => (
-                <label key={idx} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="freqD"
-                    value={freq}
-                    // checked={selectedFreq === freq}
-                    onChange={(e) => setSelectedFreq(e.target.value)}
-                  />
-                  <span>{freq}</span>
-                </label>
-              ))}
-            </div> */}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-  {frequencyOptions.map(({ label, field, type }, idx) => (
-    <label key={idx} className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        checked={selectedFreq[field][type]}
-        onChange={() => handleFreqChange(field, type)}
+    {/* Symptoms */}
+    <div>
+      <label className="block mb-1 mt-3 text-sm font-medium text-gray-700">📝 Kya hua hai?</label>
+      <textarea
+        placeholder="Symptoms..."
+        className="w-full border-2 border-green-300 p-3 rounded resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+        value={symptoms}
+        rows={2}
+        onChange={(e) => setSymptoms(e.target.value)}
       />
-      <span className='text-sm'>{label}</span>
-    </label>
-  ))}
+    </div>
+
+    {/* Search Medicine */}
+   {/* Search Medicine */}
+<div>
+  <label className="block mb-1 mt-2 text-sm font-medium text-gray-700">
+    🔍 Search Medicine
+  </label>
+  <input
+    type="text"
+    placeholder="Type medicine name..."
+    className="border w-full p-3 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
+
+  {/* Medicines Dropdown */}
+  <div
+    className={`transition-all duration-300 ease-in-out overflow-hidden ${
+      search ? "max-h-48 mt-2" : "max-h-0"
+    }`}
+  >
+    <div className="border rounded p-2 bg-green-50 overflow-y-auto max-h-40">
+      {filteredMedicines.length ? (
+        filteredMedicines.slice(0, 20).map((med, i) => (
+          <div
+            key={i}
+            className="cursor-pointer hover:bg-green-200 p-2 rounded text-sm transition"
+            onClick={() => setSelectedMedicine(med)}
+          >
+            {med.name}
+          </div>
+        ))
+      ) : (
+        <div className="text-sm text-gray-500">No medicine found</div>
+     
+     )}
+
+     
+    </div>
+  </div>
 </div>
 
-          </div>
 
-          <button
-            onClick={handleAddMedicine}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-          >
-            ➕ Add to Prescription
-          </button>
-        </div>
-      )}
+    {/* Selected Medicine */}
+    {selectedMedicine   && (
+      <div className="border p-4 rounded bg-orange-50 space-y-4 shadow-md mt-3">
+        <h3 className="font-semibold text-lg text-orange-700">🧪 {selectedMedicine.name}</h3>
 
-   
+        {/* Dose Options */}
+        {selectedMedicine?.type === "Syrup" && (
+          <>
+            <p className="text-sm font-medium text-gray-700 mb-1">💧 Select Dose:</p>
+            <div className="flex gap-4 flex-wrap">
+              {doseOptions.map((dose, idx) => (
+                <label key={idx} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="dose"
+                    value={dose}
+                    checked={selectedDose === dose}
+                    onClick={(e) => {
+                      const clickedValue = e.target.value;
+                      setSelectedDose((prev) =>
+                        prev === clickedValue ? "" : clickedValue
+                      );
+                    }}
+                  />
+                  <span className="text-gray-700">{dose}</span>
+                </label>
+              ))}
+            </div>
+          </>
+        )}
 
-      {/* Bottom Buttons */}
-      
+        {/* Frequency */}
+      {/* Frequency */}
+<div className="mt-3">
+  <p className="text-sm font-medium text-gray-700 mb-1">⏱️ Frequency:</p>
+  <div
+    className={`transition-all duration-300 ease-in-out overflow-hidden ${
+      selectedMedicine ? "max-h-60" : "max-h-0"
+    }`}
+  >
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-1">
+      {frequencyOptions.map(({ label, field, type }, idx) => (
+        <label key={idx} className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={selectedFreq[field][type]}
+            onChange={() => handleFreqChange(field, type)}
+          />
+          <span className="text-sm">{label}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+</div>
+
+
+        <button
+          onClick={handleAddMedicine}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+        >
+          ➕ Add to Prescription
+        </button>
+      </div>
+    )}
   </div>
 
- <div>
-          {/* Selected Dawa List */}
-      {patientmedicine?.length > 0 && (
-        <div
-           style={{
-        width: isTabletOrBelow ? '100%' : '500px',
-      }}
-        >
-          <h3 className="text-lg font-bold text-gray-800 mb-2">🧾 Selected Dawa List</h3>
-          <div className="overflow-x-auto rounded shadow">
-            <table className="w-full table-auto border border-gray-300">
-              <thead className="bg-green-200 text-left text-sm text-gray-800">
-                <tr>
-                  <th className="p-2">#</th>
-                  <th className="p-2">Name</th>
-                  <th className="p-2">Dose</th>
-                  <th className="p-2">Times</th>
-                  <th className="p-2">Action</th>
-                </tr>
-              </thead>
-              <tbody>
+  {/* Right Section */}
+{/* <div
+  className="flex-1 bg-white shadow-xl rounded-xl border border-gray-200 p-4"
+  style={{ minHeight: "400px", maxHeight: "400px", overflowY: "auto" }}
+>
+  {patientmedicine?.length > 0 ? (
+    <>
+  
+      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        🧾 <span>Selected Dawa List</span>
+      </h3>
+
+   
+      <div className="overflow-x-auto rounded-lg shadow-md">
+        <table className="w-full table-auto border border-gray-200 rounded-lg overflow-hidden">
+          <thead className="bg-green-600 text-left text-sm text-white">
+            <tr>
+              <th className="p-3">#</th>
+              <th className="p-3">Name</th>
+              <th className="p-3">Dose</th>
+              <th className="p-3">Times</th>
+              <th className="p-3">Action</th>
+            </tr>
+          </thead>
+          <tbody>
             {patientmedicine.map((dawa, idx) => (
-  <tr key={idx} className="border-b text-sm hover:bg-green-50">
-    <td className="p-2">{idx + 1}</td>
-    <td className="p-2 white-space-wrap">{dawa.name}</td>
-    <td className="p-2">{dawa?.dose || '--'}</td>
- 
-    <td className="p-2">{formatFrequency(dawa.frequency)}</td>
+              <tr
+                key={idx}
+                className={`text-sm transition ${
+                  idx % 2 === 0 ? "bg-green-50" : "bg-white"
+                } hover:bg-green-100`}
+              >
+                <td className="p-3 font-medium text-gray-700">{idx + 1}</td>
+                <td className="p-3 font-medium text-gray-800 break-words">
+                  {dawa.name}
+                </td>
+                <td className="p-3">{dawa?.dose || "--"}</td>
+                <td className="p-3">{formatFrequency(dawa.frequency)}</td>
+                <td className="p-3 flex flex-col md:flex-row items-center gap-2">
+                  <button
+                    onClick={() => handleEdit(dawa)}
+                    className="flex items-center gap-1 px-3 py-1 bg-yellow-400 text-white rounded-md text-xs hover:bg-yellow-500 transition"
+                  >
+                    <FaEdit /> <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(dawa)}
+                    className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-md text-xs hover:bg-red-600 transition"
+                  >
+                    <MdDeleteOutline /> <span>Delete</span>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-    <td className="p-2 space-x-2 " style={{
-      display:'flex',
-      flexDirection:'column',
-      alignItems:'center',
-      justifyContent:'center',
-      gap:'2px'
-    }}>
-      <button
-        onClick={() => handleEdit(dawa)}
-        className="px-3 py-1 bg-yellow-400 text-white rounded text-xs hover:bg-yellow-500 transition"
-      >
-        Edit
-      </button>
-      <button
-        onClick={() => handleDelete(dawa)}
-        className="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 transition"
-      >
-        Delete
-      </button>
-    </td>
-  </tr>
-))}
-
-              </tbody>
-            </table>
-          </div>
-          <div className="flex justify-end gap-4 pt-4 border-t mt-4">
-        <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition" onClick={()=>setShowPriviewData(!showPriviewData)}>
+   
+      <div className="flex justify-end gap-3 pt-4 border-t mt-4">
+        <button
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
+          onClick={() => setShowPriviewData(!showPriviewData)}
+        >
           🔍 Preview
         </button>
-        <button className="bg-green-700 text-white px-6 py-2 rounded hover:bg-green-800 transition" onClick={handleDoneTreatment}>
+        <button
+          className="flex items-center gap-2 bg-green-700 text-white px-5 py-2 rounded-md hover:bg-green-800 transition text-sm"
+          onClick={handleDoneTreatment}
+        >
           ✅ Submit
         </button>
       </div>
-        </div>
-      )}
+    </>
+  ) : (
+    <div className="flex items-center justify-center h-full text-gray-400 italic">
+      No medicines added yet.
+    </div>
+  )}
+</div> */}
 
-      
- </div>
-      
-  {/* {showPriviewData && (
-  <PriviewData
-    userInformation={patient}
-    addmedicines={patientmedicine}
-    open={showPriviewData}
-    close={() => setShowPriviewData(false)}
-  />
-)} */}
-{showPriviewData && (
+<div
+  className="flex-1 bg-white shadow-xl rounded-xl border border-gray-200 p-4"
+  style={{ minHeight: "400px", maxHeight: "400px", overflowY: "auto" }}
+>
+  {patientmedicine?.length > 0 ? (
+    <>
+      {/* Heading */}
+      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        🧾 Selected Dawa List
+      </h3>
+
+      {/* Desktop Table */}
+      <div className="hidden md:block overflow-x-auto rounded-lg shadow-md">
+        <table className="w-full table-auto border border-gray-200 rounded-lg overflow-hidden">
+          <thead className="bg-blue-950 text-left text-sm text-white">
+            <tr>
+              <th className="p-3">#</th>
+              <th className="p-3">Name</th>
+              <th className="p-3">Dose</th>
+              <th className="p-3">Times</th>
+              <th className="p-3">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {patientmedicine.map((dawa, idx) => (
+              <tr
+                key={idx}
+                className={`text-sm transition ${
+                  idx % 2 === 0 ? "bg-green-50" : "bg-white"
+                } hover:bg-green-100`}
+              >
+                <td className="p-3 font-medium text-gray-700">{idx + 1}</td>
+                <td className="p-3 font-medium text-gray-800 break-words">
+                  {dawa.name}
+                </td>
+                <td className="p-3">{dawa?.dose || "--"}</td>
+                <td className="p-3">{formatFrequency(dawa.frequency)}</td>
+                <td className="p-3 flex flex-col  items-center justify-center md:flex-row items-center justify-center gap-2">
+                  <button
+                    onClick={() => handleEdit(dawa)}
+                    className="flex items-center gap-1 px-2 py-1 bg-yellow-400 text-white rounded-md text-xl hover:bg-yellow-500 transition"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(dawa)}
+                    className="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded-md text-xl hover:bg-red-600 transition"
+                  >
+                    <MdDeleteOutline /> 
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Card List */}
+      <div className="md:hidden flex flex-col gap-3">
+        {patientmedicine.map((dawa, idx) => (
+          <div
+            key={idx}
+            className="bg-green-50 rounded-lg p-3 shadow-md flex flex-col gap-2"
+          >
+            <div className="flex justify-between items-center">
+              <span className="font-medium text-gray-800">{dawa.name}</span>
+              <span className="text-gray-600 text-sm">#{idx + 1}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 text-sm">
+              <span>Dose: {dawa?.dose || "--"}</span>
+              <span>Times: {formatFrequency(dawa.frequency)}</span>
+            </div>
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => handleEdit(dawa)}
+                className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-yellow-400 text-white rounded-md text-xs hover:bg-yellow-500 transition"
+              >
+                <FaEdit /> <span>Edit</span>
+              </button>
+              <button
+                onClick={() => handleDelete(dawa)}
+                className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-red-500 text-white rounded-md text-xs hover:bg-red-600 transition"
+              >
+                <MdDeleteOutline /> <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer Buttons */}
+      <div className="flex justify-end gap-3 pt-4 border-t mt-4">
+        <button
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
+          onClick={() => setShowPriviewData(!showPriviewData)}
+        >
+          🔍 Preview
+        </button>
+        <button
+          className="flex items-center gap-2 bg-green-700 text-white px-5 py-2 rounded-md hover:bg-green-800 transition text-sm"
+          onClick={handleDoneTreatment}
+        >
+          ✅ Submit
+        </button>
+      </div>
+    </>
+  ) : (
+    <div className="flex items-center justify-center h-full text-gray-400 italic">
+      No medicines added yet.
+    </div>
+  )}
+</div>
+
+  {showPriviewData && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
     <div className="bg-white max-h-[95vh] overflow-y-auto rounded-lg shadow-xl w-full max-w-4xl">
       <PriviewData
@@ -699,7 +862,17 @@ const handleDoneTreatment = async () => {
       />
     </div>
 </div>
+
 )}
+
+  {/* {showPriviewData && (
+  <PriviewData
+    userInformation={patient}
+    addmedicines={patientmedicine}
+    open={showPriviewData}
+    close={() => setShowPriviewData(false)}
+  />
+)} */}
 
 {patientPrint  && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
@@ -715,10 +888,15 @@ const handleDoneTreatment = async () => {
     </div>
 </div>
 )}
+</div>
 
-
-    </div>
   );
 };
 
 export default User_Details;
+
+      
+
+
+
+
