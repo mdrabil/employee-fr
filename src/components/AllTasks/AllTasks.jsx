@@ -11,28 +11,40 @@ import { AiTwotoneCalendar } from "react-icons/ai";
 import { FiCalendar, FiMessageSquare, FiEye } from "react-icons/fi";
 import { MdAttachFile } from "react-icons/md";
 import { TbCheckbox } from "react-icons/tb";
-import { getMyTasks, updateTaskStatus, updateTaskStatusApi } from "../../api/TaskApi";
+import { getAllTasksAdmin, getMyTasks, updateTaskStatus, updateTaskStatusApi } from "../../api/TaskApi";
 import TaskPopup from "./TaskPopup";
 import { showToast } from "../../utils/toastHelper";
+import { formatDateFrontend } from "../../api/CustomApi";
+import { useSelector } from "react-redux";
 
 const AllTasks = () => {
-
+ const user = useSelector((state) => state?.auth?.user);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [popupOpen, setPopupOpen] = useState(false);
     const [editTask, setEditTask] = useState(null);
   
-    const fetchTasks = async () => {
-      setLoading(true);
-      const res = await getMyTasks();
-      if (res.success) setTasks(res.data?.data);
-      console.log('taks data',res?.data)
-      setLoading(false);
-    };
-  
-    useEffect(() => {
-      fetchTasks();
-    }, []);
+const fetchTasks = async () => {
+  setLoading(true);
+  let res;
+
+  if (user?.role === "admin") {
+    // ✅ Admin ko sabke tasks milenge
+    res = await getAllTasksAdmin();
+  } else {
+    // ✅ Employee ko sirf apne tasks milenge
+    res = await getMyTasks();
+  }
+
+  if (res.success) setTasks(res.data?.data);
+  console.log("tasks data", res?.data);
+
+  setLoading(false);
+};
+
+useEffect(() => {
+  fetchTasks();
+}, [user?.role]);
   
     // Add task button click
     const handleAddClick = () => {
@@ -121,8 +133,8 @@ const getStatusStyles = (status) => {
     </div>
 
     {/* Button */}
-    <button className="flex items-center gap-2 px-3 py-2 border RedButt rounded-md">
-      <FaPlus /> New Project
+    <button onClick={handleAddClick} className="flex items-center gap-2 px-3 py-2 border RedButt rounded-md">
+      <FaPlus /> Add Task
     </button>
 
     {/* Avatar */}
@@ -174,20 +186,30 @@ const getStatusStyles = (status) => {
 
       {/* page */}
    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-5">
-      {tasks.map((item) => (
+      {tasks.map((item) => {
+            const isToday =
+      new Date(item?.date).toDateString() === new Date().toDateString();
+
+        return (
         <div
-          key={item._id}
-          className="shadow-sm rounded-lg border border-gray-200 bg-white overflow-hidden"
+           key={item._id}
+        className={`shadow-sm rounded-lg bg-white overflow-hidden ${
+          isToday ? "border-1 border-[var(--main-color)]" : "border border-gray-200"
+        }`}
+      
         >
           {/* Header */}
           <div className="flex justify-between border-b border-gray-200 items-center px-4 py-4">
             <h2 className="font-semibold text-[#111827] text-xl">
               {item?.employee?.firstName} {item?.employee?.lastName}
             </h2>
+              <h2 className="font-semibold text-[#111827] text-xl">
+              {formatDateFrontend(item?.date,'date')}
+            </h2>
           </div>
 
           {/* Tasks Scrollable Area */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-80 overflow-y-auto">
 {item?.tasks?.map((task) => {
   const styles = getStatusStyles(task.status);
 
@@ -198,12 +220,29 @@ const getStatusStyles = (status) => {
     >
       {/* Header */}
       <div className="flex justify-between items-center">
-        <span className="text-sm font-semibold text-gray-500">
-          {task?.title}
+      <div className="flex flex-col">
+           <span className="text-xs font-semibold text-[var(--main-color)]">
+          {task?.project?.name ? task?.project?.name : task?.Ptitle || "Office Work" }
         </span>
+        <span className="text-sm font-semibold text-gray-500">
+          {task?.title} 
+        </span>
+      </div>
+          
+          {/* Header */}
+      
 
         {/* Dropdown */}
         <div className="relative">
+             {/* <span
+        className={`text-sm font-medium px-2 py-0.5 rounded ${
+          task.priority === "high"
+            ? "bg-red-100 text-red-700"
+            : "bg-green-100 text-green-700"
+        }`}
+      >
+        {task.priority}
+      </span> */}
           <button
             onClick={() =>
               setOpenDropdown(openDropdown === task._id ? null : task._id)
@@ -212,6 +251,8 @@ const getStatusStyles = (status) => {
           >
             ⋮
           </button>
+
+          
           {openDropdown === task._id && (
             <div className="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
               {["pending", "in-progress", "completed"].map((status) => (
@@ -231,15 +272,7 @@ const getStatusStyles = (status) => {
       </div>
 
       {/* Priority */}
-      <span
-        className={`text-sm font-medium px-2 py-0.5 rounded ${
-          task.priority === "high"
-            ? "bg-red-100 text-red-700"
-            : "bg-green-100 text-green-700"
-        }`}
-      >
-        {task.priority}
-      </span>
+   
 
       {/* Description */}
       <h3 className="font-semibold text-[#111827] text-md">
@@ -271,10 +304,10 @@ const getStatusStyles = (status) => {
       <div className="flex justify-between items-center text-md text-gray-500">
         <div className="flex flex-wrap gap-2 text-sm">
           <span className="flex items-center gap-1">
-            <FiCalendar /> {task.startTime} - {task.endTime}
+            <FiCalendar /> {task.startTimeFormatted ? task?.startTimeFormatted :formatDateFrontend(task?.startTime,'time')} - {task.endTimeFormatted ? task?.endTimeFormatted :formatDateFrontend(task?.endTime,'time')}
           </span>
           <span className="flex items-center gap-1">
-            <MdAttachFile /> {task.remarks || "No remarks"}
+            <MdAttachFile /> {task?.meetings?.length} {task.remarks || "Meetings"}
           </span>
           <span className="flex items-center gap-1">
             <FiMessageSquare /> {item.pendingTasks}
@@ -296,7 +329,7 @@ const getStatusStyles = (status) => {
             <span>Add Task</span>
           </div>
         </div>
-      ))}
+)})}
     </div>
    {popupOpen && (
         <TaskPopup

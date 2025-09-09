@@ -61,7 +61,7 @@
 
 
 
-export function formatDate(inputDate, type = "full", locale = "en-GB") {
+export function formatDateFrontend(inputDate, type = "full", locale = "en-GB") {
   if (!inputDate) return "";
 
   const date = new Date(inputDate);

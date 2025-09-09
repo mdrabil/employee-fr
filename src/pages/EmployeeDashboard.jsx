@@ -10,20 +10,25 @@ import { FaArrowDown } from "react-icons/fa6";
 import {FaFilePdf, FaCalendarAlt } from "react-icons/fa";
 import { FaUser, FaEnvelope } from "react-icons/fa";
 import { FaPhone } from "react-icons/fa";
-import { getEmployeesDetails } from "../api/EmployeeApi";
-import { useParams } from "react-router-dom";
-import { formatDate } from "../api/CustomApi";
+import { getEmployeesDetails, getSafeEmployees } from "../api/EmployeeApi";
+import { useNavigate, useParams } from "react-router-dom";
+import { formatDateFrontend } from "../api/CustomApi";
 import  {punchInUser,endBreak, punchOut, startBreak, getTodayAttendance, getEmployeeOverallAttendance } from '../api/Attanance'
 import LoadingOverlay from "../components/overlayloading/LoadingOverlay";
 import { useSelector } from "react-redux";
+import { showToast } from "../utils/toastHelper";
+import BirthdayCard from "./BirthdayCard";
+import { getProjectsByEmployeeId } from "../api/ProjectsApi";
+import LiveTimer from "../components/Attendance/CurrentTimeCheck";
 const EmployeeDashboard = () => {
 
 const  {employeeId} = useParams();
   // const user = useSelector((state) => state.auth.user);
   // const employeeId = user?.employeeId;
   // console.log('emplo')
-
+const navigate = useNavigate()
   const [employees, setEmployees] = useState([]);
+  const [safeEmployees, setSafeEmployees] = useState([]);
   const [attendance, setAttendance] = useState(null);
   const [statsall, setStats] = useState({});
   const [loading, setLoading] = useState(false);
@@ -47,6 +52,49 @@ const  {employeeId} = useParams();
     }
   };
 
+    const fetchSafeEmployees = async () => {
+    try {
+      setLoading(true);
+      const result = await getSafeEmployees();
+      if (result.success) {
+        const data = result?.employeesdata?.data ? result.employeesdata.data : [];
+        setSafeEmployees(data);
+        // console.log('safe employee',result?.employeesdata)
+      } else {
+        setEmployees([]);
+      }
+    } catch (error) {
+      setEmployees([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+      const [allProjects, setGetProjects] = useState([]);
+
+      const fetchallProjects = async () => {
+        try {
+          setLoading(true);
+          const result = await getProjectsByEmployeeId(employeeId);
+          if (result.success) {
+            const deptArray = Array.isArray(result.projectdata) ? result?.projectdata : [];
+            setGetProjects(deptArray);
+            console.log('projects on ',deptArray)
+          } else {
+            setGetProjects([]);
+           
+          }
+        } catch (error) {
+          setGetProjects([]);
+       
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+   
+  
   // ✅ Fetch Today's Attendance
   const fetchTodayAttendance = async () => {
     if (!employeeId) return;
@@ -54,11 +102,12 @@ const  {employeeId} = useParams();
       setLoading(true);
       const { data: todayData } = await getTodayAttendance(employeeId);
       setAttendance(todayData?.attendance || null);
+        // console.log('attandane',todayData?.attendance)
 
       const result = await getEmployeeOverallAttendance(employeeId);
       if (result?.success)
-        console.log('over all attandance',result?.data)
-       setStats(result?.data?.stats || {});
+        // console.log('over all attandance',result?.data)
+       setStats(result?.data || {});
     } catch (error) {
       setAttendance(null);
       // setStats({});
@@ -93,6 +142,8 @@ const  {employeeId} = useParams();
   useEffect(() => {
     fetchEmployees();
     fetchTodayAttendance();
+    fetchSafeEmployees()
+           fetchallProjects();
   }, [employeeId]);
 
   const data = [
@@ -286,6 +337,18 @@ const skills = [
     { time: "09:10 AM", title: "Update of Project Flow", type: "Development" },
   ];
 
+
+    const lastBreak = attendance?.breaks?.slice(-1)[0];
+  let status = "Present";
+
+  if (!attendance?.checkIn) {
+    status = "Not Punched In";
+  } else if (attendance?.checkOut) {
+    status = "Finished";
+  } else if (lastBreak?.start && !lastBreak?.end) {
+    status = "On Break";
+  }
+
   
   return (
     <div className="bg-[#F9FAFB] Employee">
@@ -352,7 +415,7 @@ const skills = [
             </p>
             <p>
               <span className="font-medium text-[#6B7280]">Joined on:</span>
-              <br /> {formatDate(employees?.joiningDate,'date')}
+              <br /> {formatDateFrontend(employees?.joiningDate,'date')}
             </p>
           </div>
         </div>
@@ -463,42 +526,41 @@ const skills = [
 
 
 
-<div className="border bg-white rounded-2xl p-6 shadow-lg text-center flex flex-col items-center">
+{/* <div className="border bg-white rounded-2xl p-6 shadow-lg text-center flex flex-col items-center">
   <h2 className="font-bold text-lg text-gray-700 mb-3">Attendance</h2>
 
-  {/* Time Info */}
+
   <p className="text-md text-gray-600 font-medium">
     {attendance?.checkIn
       ? `Punched In: ${new Date(attendance.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
       : "Not Punched In"}
   </p>
 
-  {/* Circle Chart */}
+ 
   <div className="mt-4 w-24 h-24 border-[6px] border-green-400 rounded-full flex items-center justify-center text-gray-700 font-bold text-base">
     {attendance?.checkOut
       ? `${attendance.totalHours.toFixed(2)}h`
       : "⏳"}
   </div>
 
-  {/* Production Hours */}
+
   {attendance?.checkIn && (
     <span className="mt-3 bg-black text-white text-xs px-4 py-1.5 rounded-md font-semibold">
       Production: {attendance?.totalHours || 0} hrs
     </span>
   )}
 
-  {/* Warning / Info */}
+
   {!attendance?.checkIn && (
     <p className="text-red-500 text-sm font-semibold mt-3">
       ⚠ Please Punch In
     </p>
   )}
 
-  {/* Buttons */}
+
   <div className="flex gap-2 mt-5 flex-wrap justify-center">
     {!attendance?.checkIn && (
-      <button
-        className="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1.5 rounded-md shadow-sm"
+ <button className=" w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-6 rounded-lg"
         onClick={() => {
           handlePunchIn();
           toast.success("✅ Punched In successfully!");
@@ -526,6 +588,9 @@ const skills = [
           Break In
         </button>
 
+
+
+
         <button
           className={`text-white text-sm px-3 py-1.5 rounded-md shadow-sm ${
             !attendance.breaks?.slice(-1)[0]?.start || attendance.breaks?.slice(-1)[0]?.end
@@ -535,7 +600,7 @@ const skills = [
           disabled={!attendance.breaks?.slice(-1)[0]?.start || attendance.breaks?.slice(-1)[0]?.end}
           onClick={() => {
             handleEndBreak();
-            toast.info("✅ Break Ended");
+            showToast("✅ Break Ended",'success');
           }}
         >
           Break Out
@@ -546,7 +611,7 @@ const skills = [
           className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded-md shadow-sm"
           onClick={() => {
             handlePunchOut();
-            toast.success("🛑 Punched Out successfully!");
+            showToast("🛑 Punched Out successfully!",'cussess');
           }}
         >
           Punch Out
@@ -558,7 +623,155 @@ const skills = [
       <p className="text-green-600 font-semibold text-sm">✅ Work Finished</p>
     )}
   </div>
-</div>
+</div> */}
+
+
+   <div className="border bg-white rounded-2xl p-6 shadow-lg text-center flex flex-col items-center max-w-sm w-full mx-auto">
+      {/* Header */}
+      <h2 className="font-bold text-xl text-gray-800 mb-4 tracking-wide">
+        Attendance
+      </h2>
+
+      {/* 🔹 Top Info Row */}
+      <div className="w-full flex justify-between items-center mb-3 text-sm font-medium">
+        <span className=" font-bold text-[var(--main-color)] bg-red-100 px-3 py-2 rounded">
+          {attendance?.checkIn
+            ? `In: ${new Date(attendance.checkIn).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}`
+            : "--"}
+        </span>
+
+        {/* <span className="font-bold text-gray-900">
+          {lastBreak?.start && !lastBreak?.end
+            ? `Break: ${new Date(lastBreak.start).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}`
+            : attendance?.checkIn
+            ? `${new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}`
+            : "--"}
+        </span> */}
+
+        <span
+          className={`font-semibold ${
+            attendance?.currentStatus === "On Break"
+              ? "text-orange-500 bg-red-100 px-3 py-2 rounded"
+              : attendance?.currentStatus === "Present"
+              ? "text-green-600 bg-green-100 px-3 py-2 rounded"
+              : attendance?.currentStatus === "completed"
+              ? "text-blue-600"
+              : "text-red-500 bg-red-100 px-3 py-2 rounded"
+          }`}
+        >
+          {attendance?.currentStatus ?attendance?.currentStatus :'Not Started'}
+        </span>
+      </div>
+
+      {/* Circle Chart */}
+      <div className="mt-3 relative">
+        <div className="">
+          {/* {attendance?.checkIn ? `${attendance.checkIn}` : "⏳"} */}
+          <LiveTimer startTime={attendance?.checkIn} stopTime={attendance?.checkOut}   status={attendance?.currentStatus} />
+
+        </div>
+        {attendance?.checkIn && !attendance?.checkOut && (
+          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
+            Live
+          </span>
+        )}
+      </div>
+
+      {/* Production Hours */}
+      {attendance?.checkIn && (
+        <span className="mt-4 bg-gray-900 text-white text-sm px-5 py-2 rounded-full font-semibold shadow">
+          ⌛ Production: {attendance?.extraHours || 0} hrs
+        </span>
+      )}
+
+      {/* Warning / Info */}
+      {!attendance?.checkIn && (
+        <p className="text-red-500 text-sm font-semibold mt-4 animate-pulse">
+          ⚠ Please Punch In
+        </p>
+      )}
+
+      {/* Buttons */}
+      <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full justify-center">
+        {/* Punch In */}
+        {!attendance?.checkIn && (
+          <button
+            className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200"
+            onClick={() => {
+              handlePunchIn();
+              toast.success("✅ Punched In successfully!");
+            }}
+          >
+            Punch In
+          </button>
+        )}
+
+        {/* Break + Punch Out */}
+       {attendance?.checkIn && !attendance?.checkOut && (
+  <div className="flex gap-2 w-full">
+    {/* Break In */}
+    <button
+      className={`flex-1 flex items-center justify-center text-white text-xs font-medium px-3 py-2 rounded-lg shadow-md transition-all duration-200 ${
+        lastBreak?.start && !lastBreak?.end
+          ? "bg-orange-300 cursor-not-allowed opacity-60"
+          : "bg-orange-500 hover:bg-orange-600"
+      }`}
+      disabled={lastBreak?.start && !lastBreak?.end}
+      onClick={() => {
+        handleStartBreak();
+        toast.info("☕ Break Started");
+      }}
+    >
+      Break In
+    </button>
+
+    {/* Break Out */}
+    <button
+      className={`flex-1 flex items-center justify-center text-white text-xs font-medium px-3 py-2 rounded-lg shadow-md transition-all duration-200 ${
+        !lastBreak?.start || lastBreak?.end
+          ? "bg-yellow-300 cursor-not-allowed opacity-60"
+          : "bg-yellow-500 hover:bg-yellow-600"
+      }`}
+      disabled={!lastBreak?.start || lastBreak?.end}
+      onClick={() => {
+        handleEndBreak();
+        showToast("✅ Break Ended", "success");
+      }}
+    >
+      Break Out
+    </button>
+
+    {/* Punch Out */}
+    <button
+      className="flex-1 flex items-center justify-center bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-md transition-all duration-200"
+      onClick={() => {
+        handlePunchOut();
+        showToast("🛑 Punched Out successfully!", "success");
+      }}
+    >
+      Punch Out
+    </button>
+  </div>
+)}
+
+
+        {/* Finished */}
+        {attendance?.checkOut && (
+          <p className="text-green-600 font-semibold text-sm mt-2">
+            ✅ Work Finished
+          </p>
+        )}
+      </div>
+    </div>
 
 
 
@@ -591,24 +804,24 @@ const skills = [
               {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-3 text-center mb-4">
                 <div>
-                  <p className="font-bold md:text-2xl text-xl text-yellow-400">{statsall?.totalHours}</p>
+                  <p className="font-bold md:text-2xl text-xl text-yellow-400">{statsall?.summary?.totalWorkFormatted}</p>
                   <p className="text-xs text-gray-500">Total Working Hours</p>
                 </div>
               
                 <div>
-                  <p className="font-bold md:text-2xl text-xl text-green-500">{statsall?.totalBreak}</p>
+                  <p className="font-bold md:text-2xl text-xl text-green-500">{statsall?.summary?.totalBreakFormatted}</p>
                   <p className="text-xs text-gray-500">Break Hours</p>
                 </div>
                 <div>
-                  <p className="font-bold md:text-2xl text-xl text-blue-500">{statsall?.overtime}</p>
+                  <p className="font-bold md:text-2xl text-xl text-blue-500">{statsall?.summary?.totalOvertimeFormatted}</p>
                   <p className="text-xs text-gray-500">Overtime</p>
                 </div>
               </div>
 
-          <div className="overflow-x-auto">
+<div className="overflow-x-auto">
   <div className="min-w-[300px] h-5 flex rounded-sm overflow-hidden">
     {(() => {
-      // Safe converter "Xh Ymin" => decimal hours
+      // Converter "Xh Ymin" => decimal hours
       const toDecimal = (str) => {
         if (!str) return 0;
         const match = str.match(/(\d+)h\s*(\d+)min/);
@@ -618,13 +831,12 @@ const skills = [
         return hours + mins / 60;
       };
 
-      const working = toDecimal(statsall?.totalHours);   // "0h 7min" => 0.12
-      const breaks = toDecimal(statsall?.totalBreak);    // e.g. "0h 0min"
-      const overtime = toDecimal(statsall?.overtime);    // e.g. "0h 0min"
+      const working = toDecimal(statsall?.summary?.totalWorkFormatted);   // Working hours
+      const breaks = toDecimal(statsall?.summary?.totalBreakFormatted);         // Break hours
+      const overtime = toDecimal(statsall?.summary?.totalOvertimeFormatted);   // Overtime
 
-      const total = working + breaks + overtime;
-      if (total === 0) {
-        // agar sab 0 ho, ek dummy bar dikhado
+      // agar teeno zero hai to ek gray bar
+      if (working === 0 && breaks === 0 && overtime === 0) {
         return <div className="bg-gray-300 flex-1"></div>;
       }
 
@@ -634,21 +846,21 @@ const skills = [
             <div
               className="bg-yellow-400"
               style={{ flex: working }}
-              title={`Working Hours: ${stats?.totalHours}`}
+              title={`Working: ${statsall?.totalHoursFormatted}`}
             ></div>
           )}
           {breaks > 0 && (
             <div
               className="bg-green-500"
               style={{ flex: breaks }}
-              title={`Break Hours: ${stats?.totalBreak}`}
+              title={`Break: ${statsall?.totalBreakFormatted}`}
             ></div>
           )}
           {overtime > 0 && (
             <div
               className="bg-blue-500"
               style={{ flex: overtime }}
-              title={`Overtime: ${stats?.overtime}`}
+              title={`Overtime: ${statsall?.extraHoursFormatted}`}
             ></div>
           )}
         </>
@@ -656,7 +868,10 @@ const skills = [
     })()}
   </div>
 
-  {/* Time Labels */}
+
+  
+
+  {/* Labels */}
   <div className="flex justify-between text-[10px] sm:text-xs text-gray-500 mt-2">
     <span>0h</span>
     <span>4h</span>
@@ -667,6 +882,8 @@ const skills = [
     <span>24h</span>
   </div>
 </div>
+
+
             </div>
           </div>
         </div>
@@ -687,29 +904,38 @@ const skills = [
 
           {/* Projects Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5">
-            {projects.map((project, idx) => (
+       {allProjects?.slice(0, 2)?.map((project, idx) => ( 
               <div
                 key={idx}
                 className="p-5 border-[#E5E7EB] border rounded-lg "
               >
-                <h3 className="font-semibold text-xl text-[#202C4B] mb-4">
+                <h3 className="font-semibold text-xl text-[#202C4B] mb-4 capitalize">
                   {project.name}
                 </h3>
 
                 {/* Leader */}
-                <div className="flex items-center gap-3 mb-5">
-                  <img
-                    src="https://tse3.mm.bing.net/th/id/OIP.JAAd31mxF33HqZEgYq9zgAHaHv?pid=Api&P=0&h=180"
-                    alt="profile"
-                    className="w-12 h-12 rounded-full border border-gray-200"
-                  />
+           {project?.lead?.map((item,index)=>{
+            return (
+                   <div className="flex items-center gap-3 mb-5 " key={index}>
+                <img
+  src={`http://localhost:5000/api/${item?.profileImage}`}
+  alt="profile"
+  className="w-12 h-12 rounded-full border border-gray-200 object-cover"
+  onError={(e) => {
+    e.target.src =
+      "https://tse3.mm.bing.net/th/id/OIP.JAAd31mxF33HqZEgYq9zgAHaHv?pid=Api&P=0&h=180";
+  }}
+/>
+
                   <div>
                     <p className="font-medium whitespace-nowrap  text-gray-800">
-                      {project.leader}
+                      {item?.firstName}
                     </p>
                     <p className="text-sm text-gray-500">Project Leader</p>
                   </div>
                 </div>
+            )
+           })}
 
                 {/* Deadline */}
                 <div className="flex items-center gap-3 mb-5">
@@ -720,7 +946,7 @@ const skills = [
                   />
                   <div>
                     <p className="font-medium text-gray-800">
-                      {project.deadline}
+                      { formatDateFrontend(project.deadline,'date')}
                     </p>
                     <p className="text-sm text-gray-500">Deadline</p>
                   </div>
@@ -766,9 +992,24 @@ const skills = [
                   <span className="text-sm font-medium text-gray-600">
                     Time Spent
                   </span>
-                  <span className="text-sm font-semibold text-[#202C4B]">
-                    {project.timeSpent}
-                  </span>
+               <span className="text-sm font-semibold text-[#202C4B]">
+  {(() => {
+    if (!project.startDate) return "N/A";
+
+    const start = new Date(project.startDate);
+    const now = new Date();
+
+    // total milliseconds difference
+    const diffMs = now - start;
+
+    // convert to hours and minutes
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${diffHours}h ${diffMinutes}m`;
+  })()}
+</span>
+
                 </div>
               </div>
             ))}
@@ -903,7 +1144,7 @@ const skills = [
   {/* Small Widgets */}
   <div className="lg:col-span-3 flex flex-col gap-4">
     {/* Team Birthday */}
-    <div className="bg-gray-800 text-white rounded-lg p-4 text-center">
+    {/* <div className="bg-gray-800 text-white rounded-lg p-4 text-center">
       <h3 className="font-bold mb-2 text-2xl ">Team Birthday</h3>
  <div className="align-center flex justify-center">
        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="img" className="size-25 rounded-full" />
@@ -911,15 +1152,18 @@ const skills = [
       <p className="font-semibold text-xl">Andrew Jermia</p>
       <p className="text-lg text-[#6B7280] ">IOS Developer</p>
       <button className="mt-3 px-4 py-2 bg-orange-500 rounded-md text-white text-md font-bold">Send Wishes</button>
-    </div>
+    </div> */}
+
+    <BirthdayCard employees={safeEmployees} />
+
 
     {/* Leave Policy */}
-    <div className="bg-gray-600 text-white rounded-lg p-4 flex justify-between items-center">
-      <div>
+    <div className="bg-gray-600 text-white rounded-lg p-2 flex justify-between items-center">
+      <div >
         <p className="text-xl font-semibold">Leave Policy</p>
         <p className="text-md">Last Updated: Today</p>
       </div>
-      <button className="px-3 py-1 bg-white text-gray-700 rounded-md text-md">View All</button>
+      <button onClick={()=>navigate('/leave-policy')} className="px-3 py-1 bg-white text-gray-700 rounded-md text-md">View All</button>
     </div>
 
     {/* Next Holiday */}
@@ -950,20 +1194,46 @@ const skills = [
             </span>
           </div>
         <ul className="space-y-5 p-3 py-5">
-          {teamMembers.map((member, idx) => (
+          {safeEmployees?.map((member, idx) => (
             <li key={idx} className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <img src={member.img} alt={member.name} className="w-13 h-13 rounded-full" />
+                <img src={`http://localhost:5000/api/${member.profileImage}`} alt={member.firstName} className="w-13 h-13 rounded-full"/>
                 <div>
-                  <p className="text-gray-900 text-md font-medium">{member.name}</p>
-                  <p className="text-gray-500 text-sm">{member.role}</p>
+                  <p className="text-gray-900 text-md font-medium">{member?.firstName}</p>
+                  <p className="text-gray-500 text-sm">{member?.role?.name}</p>
                 </div>
               </div>
-              <div className="flex gap-4 mr-3">
+              {/* <div className="flex gap-4 mr-3">
                 <FaUser className="text-gray-400" />
               <FaPhone className="text-gray-400" />
               <FaEnvelope className="text-gray-400" />
-              </div>
+              </div> */}
+              <div className="flex gap-4 mr-3 relative group">
+
+<div className="flex gap-4 mr-3">
+  {/* Phone */}
+  <div className="relative group">
+    <FaPhone className="text-gray-400 cursor-pointer" />
+    <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2
+      opacity-0 group-hover:opacity-100 transition bg-gray-800 text-white 
+      text-xs rounded px-2 py-1 whitespace-nowrap">
+      {member?.phone || "No phone"}
+    </span>
+  </div>
+
+  {/* Email */}
+  <div className="relative group">
+    <FaEnvelope className="text-gray-400 cursor-pointer" />
+    <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2
+      opacity-0 group-hover:opacity-100 transition bg-gray-800 text-white 
+      text-xs rounded px-2 py-1 whitespace-nowrap">
+      {member?.email || "No email"}
+    </span>
+  </div>
+</div>
+
+</div>
+
             </li>
           ))}
         </ul>

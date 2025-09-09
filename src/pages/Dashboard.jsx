@@ -22,7 +22,7 @@ const fetchAllData = async () => {
       const projectsArray = Array.isArray(result.projectdata?.data)
         ? result.projectdata.data
         : [];
-      console.log("Projects:", projectsArray);
+      // console.log("Projects:", projectsArray);
       setGetProjects(projectsArray);
     } else {
       setGetProjects([]);
@@ -34,7 +34,7 @@ const fetchAllData = async () => {
       const employeesArray = Array.isArray(employeesRes?.employeesdata?.data)
         ? employeesRes?.employeesdata?.data
         : [];
-      console.log("Employees:", employeesArray);
+      // console.log("Employees:", employeesArray);
       setTeamMembers(employeesArray);
     } else {
       setTeamMembers([]);

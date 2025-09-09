@@ -1,53 +1,142 @@
-import React, { useEffect, useState } from 'react'
-import { MdReport } from "react-icons/md";
+import React, { useState, useEffect } from "react";
+
+import Pagination from "../Pagination/Pagination";
+import { TbTrash } from "react-icons/tb";
+import LoadingButton from "../overlayloading/loadingButton";
+import LoadingOverlay from "../overlayloading/LoadingOverlay";
+
+import { showToast } from "../../utils/toastHelper";
+import { usePaginate } from "../Pagination/usePagination";
+import { confirmAction } from "../../utils/confirm";
+import { FaEdit, FaSort } from "react-icons/fa";
+
+import { formatDateFrontend } from "../../api/CustomApi";
+import { getAllEmployeesAttendanceToday } from "../../api/Attanance";
 import { FiEdit } from "react-icons/fi";
-import { FaSort } from "react-icons/fa";
-import { getOverallAttendance } from '../api/Attanance';
-import { formatDateFrontend } from '../api/CustomApi';
-import { getRandomColor } from '../utils/randomColor';
+import { MdReport } from "react-icons/md";
+
+const TodayAttendance = () => {
+  const [loading, setLoading] = useState(false);
+  const [filteredAttendance, setFilteredAttendance] = useState([]);
+  const [deleteLoading, setDeleteLoading] = useState(null);
+  const [search, setsearch] = useState("");
+// onst [search, setSearch] = useState("");
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [attendance, setAttendance] = useState([]);
 
 
-
-
-
-
-
-
-const Attendence = () => {
-
-    const [attendance, setAttendance] = useState();
-  const [statsall, setStats] = useState({});
-    const [loading, setLoading] = useState(false);
-
-    // ✅ Fetch Today's Attendance
-    const fetchAttendance = async () => {
-    
-      try {
-        setLoading(true);
-        const result  = await getOverallAttendance();
-        if(result?.success)
-        setAttendance(result?.data?.records || null);
-          // console.log('over all attandance',result?.data?.records)
-         setStats(result?.data?.stats || {});
-      } catch (error) {
-        setAttendance(null);
-        // setStats({});
-      } finally {
-        setLoading(false);
+  const fetchAttendance = async () => {
+    try {
+      setLoading(true);
+      const result = await getAllEmployeesAttendanceToday();
+      if (result.success) {
+        const deptArray = Array.isArray(result?.data?.attendance) ? result?.data?.attendance : [];
+        // console.log('attned',result?.data)
+        setAttendance(deptArray);
+      } else {
+        setAttendance([]);
+        showToast(result.message || "Failed to fetch Attendance", "error");
       }
-    };
+    } catch (error) {
+      setAttendance([]);
+      showToast("Error fetching Attendance", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAttendance();
+  }, []);
+
+
+    const {
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    paginatedData,
+    totalPages,
+  } = usePaginate(filteredAttendance, 10);
+  // Filtered Attendance
+
+
+
   
 
-      useEffect(() => {
-      fetchAttendance();
-      }, []);
+const handleDelete = async (id) => {
+  // const confirmed = await confirmAction({
+  //   title: "Delete Attendance?",
+  //   // text: "This action cannot be undone!",
+  //   icon: "warning",
+  //   confirmButtonText: "Delete",
+  //   cancelButtonText: "Cancel",
+  // });
+
+  // if (!confirmed) return; // ❌ User cancelled
+
+  // try {
+  //   setDeleteLoading(id);
+  //   const result = await (id);
+
+  //   if (result.success) {
+  //     showToast("Attendance deleted!", "success");
+  //     fetchAttendance();
+  //   }
+  // } catch (error) {
+  //   showToast("Error deleting Attendance", "error");
+  // } finally {
+  //   setDeleteLoading(null);
+  // }
+};
+
+
+const handleStatusChange = async (deptId, newStatus) => {
+  try {
+    const confirmed = await confirmAction({
+      title: "Change Status?",
+      text: `You are about to mark this Attendance as ${newStatus ? "Active" : "Inactive"}.`,
+      icon: "warning",
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+    });
+    if (!confirmed) return;
+
+    const result = await updateAttendance(deptId, { status: newStatus });
+    if (result.success) {
+      showToast(`Attendance marked ${newStatus ? "Active" : "Inactive"}`, "success");
+      fetchAttendance(); // Refresh table
+    }
+  } catch (err) {
+    showToast("Error updating status", "error");
+  }
+};
+
+ useEffect(() => {
+  let filtered = attendance;
+ 
+  if (search) {
+    filtered = filtered.filter(
+      (dept) =>
+        dept.name.toLowerCase().includes(search.toLowerCase()) ||
+        dept.description.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+  setFilteredAttendance(filtered);
+}, [attendance, search]);
+
+const handleClose = ()=>{
+  setPopupOpen(false)
+  fetchAttendance()
+}
 
   return (
       <div className='bg-[#F9FAFB] Employee'>
            <header className="flex flex-col sm:flex-row px-5 py-3 justify-between items-start sm:items-center gap-3 sm:gap-0">
      <div className="w-full sm:w-auto">
        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 m-0">
-         Attendance Admin
+       Today  Attendance 
        </h2>
        <span className="text-sm text-gray-500 sm:ps-5">
          / Employee / <span className="text-gray-800">Attendance Admin</span>
@@ -239,9 +328,10 @@ const Attendence = () => {
     </button>
   </div>
 </th>
+
   <th className="p-2 text-left">
   <div className="flex border-r border-white items-center gap-4">
-    <span>Production Hours</span>
+    <span>Current Status</span>
     <button className="p-1 rounded  hover:bg-gray-200">
       <FaSort className='text-[#0000004B] size-4' />
     </button>
@@ -260,8 +350,8 @@ const Attendence = () => {
         <th className="p-2 text-left"></th>
         <th className="p-2 text-left"></th>
         <th className="p-2 text-left"></th>
+        <th className="p-2 text-left"></th>
         <th className="p-2 text-left"></th> */}
-        {/* <th className="p-2 text-left"></th> */}
       </tr>
     </thead>
     <tbody>
@@ -278,18 +368,14 @@ const Attendence = () => {
           </td>
        
           <td className="p-2 py-6 flex items-center gap-2">
-       <img
-  src={`http://localhost:5000/api/${emp?.employeeID?.profileImage}`}
-  alt={emp?.employeeID?.firstName}
-  className="w-10 h-10 rounded border-2 border-white object-cover shadow-sm 
-             hover:scale-110 hover:shadow-md transition-transform duration-300"
-/>
-
+            <img
+              src={`http://localhost:5000/api/${emp?.employeeID?.profileImage}`}
+              alt={emp?.employeeID?.firstName}
+              className="w-8 h-8 rounded-full"
+            />
             <div>
               <p className="font-medium text-gray-800">{emp?.employeeID?.firstName}</p>
-              <p className="text-xs " style={{
-                color:getRandomColor()
-              }}>{emp?.employeeID?.role?.name}</p>
+              <p className="text-xs text-gray-500">{emp?.employeeID?.role?.name}</p>
             </div>
           </td>
           <td className="p-2 py-6">
@@ -298,34 +384,26 @@ const Attendence = () => {
             </span>
           </td>
 
-           <td className="p-2 py-6 ">
-           <div className='flex flex-col items-center'>
-             <span className='font-bold'>
-             {!emp?.checkInFormatted ? formatDateFrontend(emp?.checkInFormatted,'time') : formatDateFrontend(emp?.checkIn,'date')}
-
-             </span>
-            {!emp?.checkInFormatted ? formatDateFrontend(emp?.checkInFormatted,'time') : formatDateFrontend(emp?.checkIn,'time')}
-           </div>
-            </td>
-
-                <td className="p-2 py-6 ">
-           <div className='flex flex-col items-center'>
-             <span className='font-bold'>
-             { formatDateFrontend(emp?.checkOut,'date')}
-
-             </span>
-            { formatDateFrontend(emp?.checkOut,'time')}
-           </div>
-            </td>
-  
+           <td className="p-2 py-6">{formatDateFrontend(emp?.checkIn,'time')}</td>
+          <td className="p-2 py-6">{emp?.checkOut ? formatDateFrontend(emp?.checkOut,'time'):'null'}</td>
           <td className="p-2 py-6">{emp?.totalBreakFormatted}</td>
-          <td className="p-2 py-6">{emp?.lateBy}</td>
-          <td className="p-2 py-6">
-            <span
-              className={`text-xs px-3 py-1 rounded`}
-            >
-              {emp?.extraHoursFormatted ? emp?.extraHoursFormatted : emp?.extraHours}
-            </span>
+          <td className="p-2 py-6">{emp.lateBy}</td>
+    
+
+               <td className="p-2 py-6">
+             <span
+          className={`font-semibold ${
+            emp?.currentStatus === "On Break"
+              ? "text-orange-500 bg-red-100 px-3 py-2 rounded"
+              : emp?.currentStatus === "Present"
+              ? "text-green-600 bg-green-100 px-3 py-2 rounded"
+              : emp?.currentStatus === "completed"
+              ? "text-blue-600"
+              : "text-red-500 bg-red-100 px-3 py-2 rounded"
+          }`}
+        >
+          {emp?.currentStatus ? emp?.currentStatus :'Not Started'}
+        </span>
           </td>
           <td className="p-2 text-gray-800 cursor-pointer">
             <FiEdit />
@@ -334,7 +412,7 @@ const Attendence = () => {
       ))}
      
     </tbody>
-    
+       
   </table>
    <div className='flex justify-between px-5 py-4 w-full font-normal'>
         <div>
@@ -353,6 +431,5 @@ const Attendence = () => {
 
    </div>
   )
-}
-
-export default Attendence
+};
+export default TodayAttendance;

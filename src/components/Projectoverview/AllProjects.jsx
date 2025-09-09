@@ -12,7 +12,7 @@ import { FaEdit, FaEye } from "react-icons/fa";
 // import EmployeePopup from "./EmployeePopup";
 import ProjectPopup from "../Projectoverview/ProjectPopup";
 
-import { formatDate } from "../../api/CustomApi";
+import { formatDateFrontend } from "../../api/CustomApi";
 import { useNavigate } from "react-router-dom";
 import { getProjects, updateProjects } from "../../api/ProjectsApi";
 import { ProjectTable } from "./ProjectTable";
@@ -34,7 +34,7 @@ const navigate = useNavigate()
       const result = await getProjects();
       if (result.success) {
         const deptArray = Array.isArray(result.projectdata?.data) ? result?.projectdata?.data : [];
-        console.log('projects ',deptArray)
+        // console.log('projects ',deptArray)
         setGetProjects(deptArray);
       } else {
         setGetProjects([]);
@@ -99,13 +99,6 @@ const handleStatusChange = async (empId, newStatus) => {
 useEffect(() => {
   let filtered = allProjects;
 
-//   if (search) {
-//     filtered = filtered.filter(emp =>
-//       `${emp.firstName} ${emp.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
-//       emp.email.toLowerCase().includes(search.toLowerCase()) ||
-//       (emp.phone && emp.phone.includes(search))
-//     );
-//   }
   setfilteredProjects(filtered);
 }, [allProjects, search]);
 

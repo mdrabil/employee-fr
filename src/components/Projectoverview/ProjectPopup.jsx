@@ -99,7 +99,7 @@ const ProjectPopup = ({ isEdit, data, close }) => {
     });
 
     if (!confirmed) return; // ❌ User cancelled
-console.log('payload',payload)
+// console.log('payload',payload)
     try {
       setLoading(true);
       let result;

@@ -49,7 +49,7 @@ const navigate = useNavigate()
       const result = await getEmployees();
       if (result.success) {
         const deptArray = Array.isArray(result.employeesdata?.data) ? result?.employeesdata?.data : [];
-        console.log('emdopy ',deptArray)
+        // console.log('emdopy ',deptArray)
         setEmployees(deptArray);
       } else {
         setEmployees([]);
@@ -242,6 +242,46 @@ const handleClose = ()=>{
       // Calculate progress (for example using tasks completed)
     //   const totalTasks = proj.tasks.length;
  
+
+    // 🔹 Hash function for consistency
+const stringToColor = (str) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const c = (hash & 0x00FFFFFF)
+    .toString(16)
+    .toUpperCase();
+
+  return "#" + "00000".substring(0, 6 - c.length) + c;
+};
+
+// 🔹 Function to lighten a color
+const lightenColor = (color, percent) => {
+  let num = parseInt(color.replace("#", ""), 16),
+    amt = Math.round(2.55 * percent),
+    R = (num >> 16) + amt,
+    G = ((num >> 8) & 0x00ff) + amt,
+    B = (num & 0x0000ff) + amt;
+  return (
+    "#" +
+    (
+      0x1000000 +
+      (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+      (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+      (B < 255 ? (B < 1 ? 0 : B) : 255)
+    )
+      .toString(16)
+      .slice(1)
+  );
+};
+
+// 🔹 Usage in component
+const roleName = emp.role?.name || "Unknown";
+const baseColor = stringToColor(roleName); // dark color for text
+const lightBg = lightenColor(baseColor, 60); // lightened background
+
+
       return (  
 
         <>
@@ -279,16 +319,27 @@ const handleClose = ()=>{
             <h3 className="font-bold text-gray-800">{emp?.firstName} {emp?.lastName}</h3>
             {/* <p className={`text-sm px-2 py-1 rounded font-medium  `} >{emp.role?.name}</p> */}
         <div className='flex justify-center'>
-                <p
+
+          <p
+  className="text-sm font-medium px-2 w-fit mt-1 rounded"
+  style={{
+    color: baseColor,
+    backgroundColor: lightBg,
+  }}
+>
+  {roleName}
+</p>
+                {/* <p
   className={`text-sm font-medium px-2 w-fit  mt-1 rounded 
-    ${emp.role?.name === "Software Developer" ? "text-[#FD3995] bg-[#FFEDF6]" : ""} 
+    
+    ${emp.role?.name === "Digital Marketer" ? "text-[#FD3995] bg-[#FFEDF6]" : ""} 
     ${emp.role?.name === "Tester" ? "text-[#0DCAF0] bg-[#D3F5FC]" : ""} 
     ${emp.role?.name === "Developer" ? "text-[#AB47BC] bg-[#F7EEF9]" : ""} 
-    ${emp.role?.name === "Full Stack Developer " ? "text-[#3B7080] bg-[#EDF2F4]" : ""} 
+    ${emp.role?.name === "Full Stack Develper" ? "text-[#3B7080] bg-[#EDF2F4]" : ""} 
     ${emp.role?.name === "Project Manager" ? "text-green-600 bg-green-100" : ""}`}
 >
   {emp.role?.name}
-</p>
+</p> */}
         </div>
 
             <div className="mt-3 grid grid-cols-3 font-normal text-sm text-gray-600">

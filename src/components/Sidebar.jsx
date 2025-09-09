@@ -410,7 +410,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { path: "/employees", label: "Members" },
         { path: "/members-profile", label: "Members Profile" },
         { path: "/holidays", label: "Holidays" },
-        { path: "/attendance-employees", label: "Attendance Employees" },
+        { path: "/attendance-employees", label: "Today Attendance" },
         { path: "/attendance", label: "Attendance" },
         { path: "/leave-request", label: "Leave Request" },
         { path: "/department", label: "Department" },

@@ -8,7 +8,19 @@ export const getEmployees = async () => {
   try {
     const response = await axiosInstance.get("/employees");
 
-    console.log('data',response?.data)
+    // console.log('data',response?.data)
+
+    return { success: true, employeesdata:response?.data };
+  } catch (error) {
+    return handleApiError(error); // yahan toast trigger hoga
+  }
+};
+
+export const getSafeEmployees = async () => {
+  try {
+    const response = await axiosInstance.get("/employees/safe");
+
+    // console.log('data',response?.data)
 
     return { success: true, employeesdata:response?.data };
   } catch (error) {
@@ -20,7 +32,7 @@ export const getSingleEmployees = async (id) => {
   try {
     const response = await axiosInstance.get(`/employees/${id}`);
 
-    console.log('data',response?.data)
+    // console.log('data',response?.data)
 
     return { success: true, employeesdata:response?.data };
   } catch (error) {

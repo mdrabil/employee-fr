@@ -8,7 +8,7 @@ export const getDepartments = async () => {
   try {
     const response = await axiosInstance.get("/departments");
 
-    console.log('data',response?.data)
+    // console.log('data',response?.data)
 
     return { success: true, department:response?.data };
   } catch (error) {
@@ -20,7 +20,7 @@ export const getSingleDepartments = async (id) => {
   try {
     const response = await axiosInstance.get(`/departments/${id}`);
 
-    console.log('data',response?.data)
+    // console.log('data',response?.data)
 
     return { success: true, department:response?.data };
   } catch (error) {

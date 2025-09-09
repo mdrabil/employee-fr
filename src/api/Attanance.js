@@ -139,7 +139,7 @@ export const getTodayAttendance= async (empNo) => {
 
 export const getAllEmployeesAttendanceToday = async () => {
   try {
-    const response = await axiosInstance.get(`/attendance`);
+    const response = await axiosInstance.get(`/attendance/today`);
     return { success: true, data: response.data };
   } catch (error) {
     return handleApiError(error);

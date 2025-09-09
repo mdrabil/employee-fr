@@ -5,11 +5,15 @@ import { IoMdMore } from 'react-icons/io';
 import { RiFileListLine } from 'react-icons/ri';
 import { VscGraph } from "react-icons/vsc";
 import { CiCalendarDate, CiFilter } from "react-icons/ci";
-import { formatDate } from '../../api/CustomApi';
+import { formatDateFrontend } from '../../api/CustomApi';
+import { useNavigate } from 'react-router-dom';
+import { BiDownload } from 'react-icons/bi';
+import { getStatusByColor, getStatusStyles } from '../../utils/progressReport';
 /**
  * Project Component - projects overview 
  */
 const Project = ({allProjects}) => {
+  const navigate = useNavigate()
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [showDropdown, setShowDropdown] = useState(null);
@@ -105,7 +109,7 @@ const Project = ({allProjects}) => {
         </div>
         <p className="project-description">{project?.description?.slice(0,15)}</p>
       </div>
-      <div className={`project-status ${project?.status}`}>{project?.status}</div>
+      <div className={`rounded px-2 py-1 ${getStatusByColor(project?.status)}`}>{project?.status}</div>
     </div>
   );
 
@@ -117,24 +121,8 @@ const Project = ({allProjects}) => {
     setShowDropdown(null);
     
     if (action === 'edit') {
-      const project = projectsData.find(p => p.id === projectId);
-      if (project) {
-        setSelectedProject(project);
-        setEditTask({
-          title: project.name,
-          project: project.name,
-          priority: 'High',
-          dueDate: '2023-11-15',
-          description: project.description,
-          assignee: 'Project Team',
-          subtasks: [
-            { id: 1, text: 'Design wireframes', completed: true },
-            { id: 2, text: 'Develop components', completed: false },
-            { id: 3, text: 'Testing and QA', completed: false }
-          ]
-        });
-        setShowEditModal(true);
-      }
+      
+   navigate(`/project-details/${projectId}`)
     }
   };
 
@@ -204,7 +192,7 @@ const Project = ({allProjects}) => {
       <div className="project-deadline">
         {/* <i className="ri-calendar-line"></i> */}
         <CiCalendarDate />
-        <span>Deadline: {formatDate(project?.deadline,'date')}</span>
+        <span>Deadline: {formatDateFrontend(project?.deadline,'date')}</span>
       </div>
       <div className="project-menu-container">
         <button 
@@ -221,7 +209,7 @@ const Project = ({allProjects}) => {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
               </svg>
-              Edit Project
+              View Project
             </div>
             <div className="project-action-item" onClick={() => handleProjectAction('complete', project?._id)}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -229,12 +217,44 @@ const Project = ({allProjects}) => {
               </svg>
               Mark as Completed
             </div>
-            <div className="project-action-item" onClick={() => handleProjectAction('archive', project?._id)}>
+
+                <div className="project-action-item" onClick={() => {
+      // Create a temporary print container
+      const printContent = document.createElement("div");
+      printContent.innerHTML = project?.description.replace(/\n/g, "<br/>");
+      const printWindow = window.open("", "_blank");
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Description</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; white-space: pre-line; }
+            </style>
+          </head>
+          <body>${printContent.innerHTML}</body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }}
+   
+  >
+
+  
+            <BiDownload/>
+              Download Doc
+            </div>
+                            
+
+ 
+            {/* <div className="project-action-item" onClick={() => handleProjectAction('archive', project?._id)}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/>
               </svg>
               Archive Project
-            </div>
+            </div> */}
             <div className="project-action-item delete" onClick={() => handleProjectAction('delete', project?._id)}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>

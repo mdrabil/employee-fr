@@ -12,7 +12,7 @@ import { FaEdit, FaEye } from "react-icons/fa";
 import EmployeePopup from "./EmployeePopup";
 import ProjectPopup from "../Projectoverview/ProjectPopup";
 import { getEmployees, updateEmployee } from "../../api/EmployeeApi";
-import { formatDate } from "../../api/CustomApi";
+import { formatDateFrontend } from "../../api/CustomApi";
 import { useNavigate } from "react-router-dom";
 
 const Employees = () => {
@@ -32,7 +32,7 @@ const navigate = useNavigate()
       const result = await getEmployees();
       if (result.success) {
         const deptArray = Array.isArray(result.employeesdata?.data) ? result?.employeesdata?.data : [];
-        console.log('emdopy ',deptArray)
+        // console.log('emdopy ',deptArray)
         setEmployees(deptArray);
       } else {
         setEmployees([]);
@@ -176,7 +176,7 @@ const handleClose = ()=>{
                </div>
           </td>
                <td className="p-2 text-sm md:text-base">{empt.department?.name || "not found"}</td>
-               <td className="p-2 text-sm md:text-base">{formatDate(empt?.joiningDate,'date') || "not found"}</td>
+               <td className="p-2 text-sm md:text-base">{formatDateFrontend(empt?.joiningDate,'date') || "not found"}</td>
              
                <td className="p-2">
                  <label className="inline-flex items-center cursor-pointer">
@@ -253,7 +253,7 @@ const handleClose = ()=>{
                <p><span className="font-semibold">Phone:</span> {emp.phone}</p>
                <p><span className="font-semibold">Employee ID:</span> {emp.employeeId}</p>
                <p><span className="font-semibold">Department:</span> {emp.department?.name || "Not Found"}</p>
-               <p><span className="font-semibold">Joining Date:</span> {formatDate(emp.joiningDate, 'date')}</p>
+               <p><span className="font-semibold">Joining Date:</span> {formatDateFrontend(emp.joiningDate, 'date')}</p>
              </div>
      
           

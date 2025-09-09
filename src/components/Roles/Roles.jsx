@@ -27,7 +27,7 @@ const Roles = () => {
       const result = await getRoles();
       if (result.success) {
         const deptArray = Array.isArray(result.roles?.data) ? result?.roles?.data : [];
-        console.log('deptArray',deptArray)
+        // console.log('deptArray',deptArray)
         setRoles(deptArray);
       } else {
         setRoles([]);

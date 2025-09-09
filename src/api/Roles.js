@@ -8,7 +8,7 @@ export const getRoles = async () => {
   try {
     const response = await axiosInstance.get("/roles");
 
-    console.log('data',response?.data)
+    // console.log('data',response?.data)
 
     return { success: true, roles:response?.data };
   } catch (error) {

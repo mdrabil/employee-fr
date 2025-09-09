@@ -75,7 +75,7 @@ const Team = ({allEmployee}) => {
    * @param {string} memberId - Kis team member ke liye action karna hai
    */
   const handleAction = (action, memberId) => {
-    console.log(`${action} action for member ${memberId}`)
+    // console.log(`${action} action for member ${memberId}`)
     setActiveDropdown(null)
   }
 

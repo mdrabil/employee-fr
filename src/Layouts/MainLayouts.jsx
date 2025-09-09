@@ -130,7 +130,7 @@ const Layout = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
 const [sidebarOpen, setSidebarOpen] = useState(false);
   const user = useSelector((state) => state?.auth?.user);
-  console.log('user data',user)
+  // console.log('user data',user)
   const isLoginPage = location.pathname === '/login';
 
  useEffect(() => {
@@ -160,7 +160,7 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const showLayout = user &&  !isLoginPage;
   const showHeader = user && !isLoginPage;
-console.log('ismoboe',isMobile)
+// console.log('ismoboe',isMobile)
 return (
   <div className="flex flex-col md:flex-row bg-[#f8fafc] overflow-x-hidden " >
     {/* Sidebar */}

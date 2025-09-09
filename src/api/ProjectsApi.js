@@ -8,7 +8,7 @@ export const getProjects = async () => {
   try {
     const response = await axiosInstance.get("/projects");
 
-    console.log('data',response?.data)
+    // console.log('data',response?.data)
 
     return { success: true, projectdata:response?.data };
   } catch (error) {
@@ -20,14 +20,25 @@ export const getSingleProjects = async (id) => {
   try {
     const response = await axiosInstance.get(`/projects/${id}`);
 
-    console.log('data',response?.data)
+    // console.log('signle data',response?.data?.data)
 
-    return { success: true, projectdata:response?.data };
+    return { success: true, projectdata:response?.data?.data };
   } catch (error) {
     return handleApiError(error); // yahan toast trigger hoga
   }
 };
 
+export const getProjectsByEmployeeId = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/projects/employee/${id}`);
+
+    // console.log('signle data',response?.data?.data)
+
+    return { success: true, projectdata:response?.data?.data };
+  } catch (error) {
+    return handleApiError(error); // yahan toast trigger hoga
+  }
+};
 // ✅ Create Projectsdata
 export const createProjects = async (data) => {
   try {
